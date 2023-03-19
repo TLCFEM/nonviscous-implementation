@@ -78,19 +78,19 @@ Typically, $\ddfrac{\bv}{\bu}$ reduces to a scalar constant (multiplied by an id
 
 Noting that $\pdfrac{\mb{W}}{\mb{F}}$ is a diagonal matrix that can be easily inverted, there is no need to explicitly formulate the Jacobian. Instead, one could perform static condensation such that, from the second expression,
 \begin{gather}
--m\Delta{}t\mb{T}\ddfrac{\bv}{\bu}\delta\bu+\left(1+s\Delta{}t\right)\delta\mb{F}=\mb{W},
+-m\Delta{}t\mb{T}\ddfrac{\bv}{\bu}\delta\bu+\left(1+s\Delta{}t\right)\delta\mb{F}=-\mb{W},
 \end{gather}
 the increment $\delta\mb{F}$ is
 \begin{gather}
-\delta\mb{F}=\dfrac{1}{1+s\Delta{}t}\left(\mb{W}+m\Delta{}t\mb{T}\ddfrac{\bv}{\bu}\delta\bu\right),
+\delta\mb{F}=\dfrac{1}{1+s\Delta{}t}\left(-\mb{W}+m\Delta{}t\mb{T}\ddfrac{\bv}{\bu}\delta\bu\right),
 \end{gather}
 substituting it into the first expression yields
 \begin{gather}
-\bbar{K}\delta\bu+\dfrac{1}{1+s\Delta{}t}\left(\mb{W}+m\Delta{}t\mb{T}\ddfrac{\bv}{\bu}\delta\bu\right)=\mb{Q}.
+\bbar{K}\delta\bu+\dfrac{1}{1+s\Delta{}t}\left(-\mb{W}+m\Delta{}t\mb{T}\ddfrac{\bv}{\bu}\delta\bu\right)=-\mb{Q}.
 \end{gather}
 Rearranging gives
 \begin{gather}
-\left(\bbar{K}+\dfrac{m\Delta{}t}{1+s\Delta{}t}\mb{T}\ddfrac{\bv}{\bu}\right)\delta\bu=\mb{Q}-\dfrac{1}{1+s\Delta{}t}\mb{W}.
+\left(\bbar{K}+\dfrac{m\Delta{}t}{1+s\Delta{}t}\mb{T}\ddfrac{\bv}{\bu}\right)\delta\bu=-\left(\mb{Q}-\dfrac{1}{1+s\Delta{}t}\mb{W}\right).
 \end{gather}
 By denoting
 \begin{gather}
@@ -99,9 +99,9 @@ By denoting
 \end{gather}
 the system to be solved is simply
 \begin{gather}
-\bhat{K}\delta\bu=\bhat{Q}.
+\bhat{K}\delta\bu=-\bhat{Q}.
 \end{gather}
-The revised effective load vector $\bhat{Q}$ can be explicitly written as
+Furthermore, $\bhat{Q}$ can be explicitly written as
 \begin{gather}
 \bhat{Q}=\mb{Y}-\mb{P}+\dfrac{1}{1+s\Delta{}t}\mb{F}_n+\dfrac{1}{1+s\Delta{}t}m\Delta{}t\bw.
 \end{gather}
