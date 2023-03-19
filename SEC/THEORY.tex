@@ -1,12 +1,12 @@
-\section{Nonviscous Damping With A Single Exponential Kernel}
-\subsection{Nonviscous Damped System}
+\section{Basics}
+\subsection{Nonviscously Damped System}
 Consider the equation of motion of a nonviscously damped inelastic multi-degree-of-freedom (MDOF) system,
 \begin{gather}\label{eq:eom}
-\mb{Y}\left(\bu,\bv,\ba\right)+\mb{F}\left(t\right)=\mb{P}\left(t\right),
+\mb{y}\left(\bu,\bv,\ba\right)+\bbf\left(t\right)=\mb{p}\left(t\right),
 \end{gather}
-where $\bu=\bu\left(t\right)$, $\bv=\bv\left(t\right)=\dot{\bu}$ and $\ba=\ba\left(t\right)=\dot{\bv}$ are the displacement, velocity and acceleration vectors, $\mb{Y}=\mb{Y}\left(\bu,\bv,\ba\right)$ is the resistance vector of the system, $\mb{P}=\mb{P}\left(t\right)$ is the external load vector, and $\mb{F}$ is the nonviscous damping force which can be expressed in the form of the convolution of the kernel $f=f\left(t\right)$ and the vector $\bw$, viz. $\mb{F}\left(t\right)=f*\bw$.
+where $\bu=\bu\left(t\right)$, $\bv=\bv\left(t\right)=\dot{\bu}$ and $\ba=\ba\left(t\right)=\dot{\bv}$ are the displacement, velocity and acceleration vectors, $\mb{y}=\mb{y}\left(\bu,\bv,\ba\right)$ is the resistance vector of the system, $\mb{p}=\mb{p}\left(t\right)$ is the external load vector, and $\bbf$ is the nonviscous damping force which can be expressed in the form of the convolution of the kernel $g=g\left(t\right)$ and the vector $\bw$, viz. $\bbf\left(t\right)=g*\bw$.
 
-Note here, $\bw$ can be either the exact velocity vector $\bv$, or the subset of $\bv$ such that they share the same size but some velocity components in $\bv$ are replaced by zeros in $\bw$ on selected DoFs. This is beneficial when it comes to compositing flexible damping that will be discussed later in this work. Formally,
+Note here, $\bw$ can be either the exact velocity vector $\bv$, or the subset of $\bv$ such that they share the same size but some velocity components in $\bv$ are replaced by zeros in $\bw$ on selected DoFs. This is beneficial when it comes to compositing flexible damping that will be discussed later in this work. Formally, it can be represented by
 \begin{gather}
 \bw=\mb{T}\bv,
 \end{gather}
@@ -14,28 +14,29 @@ where $\mb{T}$ is a square diagonal matrix, the diagonal entries of which are ei
 
 Since it is an inelastic system, the stiffness matrix $\mb{K}$, the viscous damping matrix $\mb{C}$ and the mass matrix $\mb{M}$ are
 \begin{gather}
-\pdfrac{\mb{Y}}{\bu}=\mb{K},\qquad
-\pdfrac{\mb{Y}}{\bv}=\mb{C},\qquad
-\pdfrac{\mb{Y}}{\ba}=\mb{M}.
+\pdfrac{\mb{y}}{\bu}=\mb{K},\qquad
+\pdfrac{\mb{y}}{\bv}=\mb{C},\qquad
+\pdfrac{\mb{y}}{\ba}=\mb{M}.
 \end{gather}
 The viscous damping matrix $\mb{C}$ may not be trivial as the system may consist of viscous damping components (e.g., viscous damper devices). Using $\bu$ as the basic quantity, the effective stiffness matrix $\bbar{K}$
 \begin{gather}
-\bbar{K}=\ddfrac{\mb{Y}}{\bu}=\mb{K}+\mb{C}\ddfrac{\bv}{\bu}+\mb{M}\ddfrac{\ba}{\bu}
+\bbar{K}=\ddfrac{\mb{y}}{\bu}=\mb{K}+\mb{C}\ddfrac{\bv}{\bu}+\mb{M}\ddfrac{\ba}{\bu}
 \end{gather}
 is the combination of the three, its specific form depends on the specific time integration method used.
+\section{Nonviscous Damping With A Single Exponential Kernel}
 \subsection{A Single Exponential Kernel}
-For the moment, we focus on the scalar-valued exponential kernel function
+We start with the scalar-valued exponential kernel function
 \begin{gather}
-f=f\left(t\right)=m\exp\left(-st\right),
+g=g\left(t\right)=m\exp\left(-st\right),
 \end{gather}
-where $s$ is often denoted by the relaxation parameter $\mu$, $m$ is often denoted by $c\mu$ in which $c$ is the damping constant.
+where $s$ is often denoted by the relaxation parameter $\mu$, $m$ is often denoted by $c\mu$ in which $c$ is the damping constant. In this work, $s$ and $m$ are adopted for brevity.
 The convolution can be then expressed as
 \begin{gather}\label{eq:single_conv}
-\mb{F}\left(t\right)=f*\bw=\int_0^tf(t-\tau)\cdot\bw\left(\tau\right)~\md{\tau}=\int_0^tm\exp\left(-s\left(t-\tau\right)\right)\cdot\bw\left(\tau\right)~\md{\tau}.
+\bbf\left(t\right)=g*\bw=\int_0^tg(t-\tau)\cdot\bw\left(\tau\right)~\md{\tau}=\int_0^tm\exp\left(-s\left(t-\tau\right)\right)\cdot\bw\left(\tau\right)~\md{\tau}.
 \end{gather}
 Assuming trivial initial condition $\bv\left(0\right)=\mb{0}$, \eqsref{eq:single_conv} corresponds to the solution of the following ODE,
 \begin{gather}\label{eq:single_conv_ode}
-\mb{F}'=-s\mb{F}+m\bw.
+\bbf'=-s\bbf+m\bw.
 \end{gather}
 It can be validated by solving \eqsref{eq:single_conv_ode} with the assist of the integrating factor $\exp\left(st\right)$.
 \subsection{An Efficient Algorithm}
@@ -43,32 +44,32 @@ Instead of directly integrating \eqsref{eq:single_conv} using higher-order metho
 
 In the context of a discretised iterative solving schema, \eqsref{eq:single_conv_ode} can be rewritten as follows using the backward (implicit) Euler method,
 \begin{gather}\label{eq:discretised_a}
-\dfrac{\mb{F}_{n+1}-\mb{F}_n}{\Delta{}t}=-s\mb{F}_{n+1}+m\bw_{n+1},
+\dfrac{\bbf_{n+1}-\bbf_n}{\Delta{}t}=-s\bbf_{n+1}+m\bw_{n+1},
 \end{gather}
 in which subscripts $\left(\cdot\right)_{n+1}$ and $\left(\cdot\right)_n$ denote the corresponding quantity at $t_n$ and $t_{n+1}=t_n+\Delta{}t$.
 Rearranging \eqsref{eq:discretised_a} yields
 \begin{gather}\label{eq:discretised_b}
-\left(1+s\Delta{}t\right)\mb{F}_{n+1}-\mb{F}_n-m\Delta{}t\bw_{n+1}.
+\left(1+s\Delta{}t\right)\bbf_{n+1}-\bbf_n-m\Delta{}t\bw_{n+1}.
 \end{gather}
 
 Assuming \eqsref{eq:eom} is satisfied at $t_{n+1}$\footnote{This assumption is not always valid as some time integration methods establish the EOM elsewhere, see, for example, the generalised-$\alpha$ method, the GSSSS method, the Bathe two-step method, the OALTS method, etc.}, then, accounting for both \eqsref{eq:eom} and \eqsref{eq:discretised_b}, the residual $\mb{R}$ (with the subscript $\left(\cdot\right)_{n+1}$ dropped for brevity) is
-\begin{gather}
+\begin{gather}\label{eq:residual}
 \mb{R}=\begin{bmatrix}
 \mb{Q}\\\mb{W}
 \end{bmatrix}=\left\{
 \begin{array}{l}
-\mb{Y}+\mb{F}-\mb{P},\\
-\left(1+s\Delta{}t\right)\mb{F}-\mb{F}_n-m\Delta{}t\bw.
+\mb{y}+\bbf-\mb{p},\\
+\left(1+s\Delta{}t\right)\bbf-\bbf_n-m\Delta{}t\bw.
 \end{array}
 \right.
 \end{gather}
 The unknown quantity is $\bx=\begin{bmatrix}
-\bu&\mb{F}
+\bu&\bbf
 \end{bmatrix}^\mT$. Linearisation results in the following Jacobian.
 \begin{gather}
 \mb{J}=\begin{bmatrix}
-\pdfrac{\mb{Q}}{\bu}&\pdfrac{\mb{Q}}{\mb{F}}\\[4mm]
-\pdfrac{\mb{W}}{\bu}&\pdfrac{\mb{W}}{\mb{F}}
+\pdfrac{\mb{Q}}{\bu}&\pdfrac{\mb{Q}}{\bbf}\\[4mm]
+\pdfrac{\mb{W}}{\bu}&\pdfrac{\mb{W}}{\bbf}
 \end{bmatrix}=\begin{bmatrix}
 \bbar{K}&\mb{I}\\[4mm]
 -m\Delta{}t\mb{T}\ddfrac{\bv}{\bu}&\left(1+s\Delta{}t\right)\mb{I}
@@ -76,13 +77,13 @@ The unknown quantity is $\bx=\begin{bmatrix}
 \end{gather}
 Typically, $\ddfrac{\bv}{\bu}$ reduces to a scalar constant (multiplied by an identity matrix), for example, in the Newmark method, it is $\dfrac{\gamma}{\beta\Delta{}t}$.
 
-Noting that $\pdfrac{\mb{W}}{\mb{F}}$ is a diagonal matrix that can be easily inverted, there is no need to explicitly formulate the Jacobian. Instead, one could perform static condensation such that, from the second expression,
+Noting that $\pdfrac{\mb{W}}{\bbf}$ is a diagonal matrix that can be easily inverted, there is no need to explicitly formulate the Jacobian, which would require memory reallocation and unnecessary memory copy. Instead, one could perform static condensation such that, from the second expression in \eqsref{eq:residual},
 \begin{gather}
--m\Delta{}t\mb{T}\ddfrac{\bv}{\bu}\delta\bu+\left(1+s\Delta{}t\right)\delta\mb{F}=-\mb{W},
+-m\Delta{}t\mb{T}\ddfrac{\bv}{\bu}\delta\bu+\left(1+s\Delta{}t\right)\delta\bbf=-\mb{W},
 \end{gather}
-the increment $\delta\mb{F}$ is
-\begin{gather}
-\delta\mb{F}=\dfrac{1}{1+s\Delta{}t}\left(-\mb{W}+m\Delta{}t\mb{T}\ddfrac{\bv}{\bu}\delta\bu\right),
+the increment $\delta\bbf$ is
+\begin{gather}\label{eq:incre_f}
+\delta\bbf=\dfrac{1}{1+s\Delta{}t}\left(-\mb{W}+m\Delta{}t\mb{T}\ddfrac{\bv}{\bu}\delta\bu\right),
 \end{gather}
 substituting it into the first expression yields
 \begin{gather}
@@ -93,15 +94,96 @@ Rearranging gives
 \left(\bbar{K}+\dfrac{m\Delta{}t}{1+s\Delta{}t}\mb{T}\ddfrac{\bv}{\bu}\right)\delta\bu=-\left(\mb{Q}-\dfrac{1}{1+s\Delta{}t}\mb{W}\right).
 \end{gather}
 By denoting
-\begin{gather}
-\bhat{K}=\bbar{K}+\dfrac{m\Delta{}t}{1+s\Delta{}t}\mb{T}\ddfrac{\bv}{\bu},\qquad
+\begin{gather}\label{eq:revised_k}
+\bhat{K}=\bbar{K}+\dfrac{m\Delta{}t}{1+s\Delta{}t}\mb{T}\ddfrac{\bv}{\bu},\\
 \bhat{Q}=\mb{Q}-\dfrac{1}{1+s\Delta{}t}\mb{W},
 \end{gather}
-the system to be solved is simply
-\begin{gather}
+the final system to be solved is simply
+\begin{gather}\label{eq:revised_system}
 \bhat{K}\delta\bu=-\bhat{Q}.
 \end{gather}
-Furthermore, $\bhat{Q}$ can be explicitly written as
-\begin{gather}
-\bhat{Q}=\mb{Y}-\mb{P}+\dfrac{1}{1+s\Delta{}t}\mb{F}_n+\dfrac{1}{1+s\Delta{}t}m\Delta{}t\bw.
+Furthermore, by expanding $\bhat{Q}$, one can obtain the revised resistance $\bhat{y}$ as
+\begin{gather}\label{eq:revised_y}
+\bhat{y}=\mb{y}+\dfrac{1}{1+s\Delta{}t}\bbf_n+\dfrac{m\Delta{}t}{1+s\Delta{}t}\bw.
 \end{gather}
+
+The local iteration body is summarised in \algoref{algo:single_model}.
+\begin{breakablealgorithm}
+\setstretch{1.6}
+\caption{solving nonviscously damped system with one exponential kernel}\label{algo:single_model}
+\begin{algorithmic}
+\State \textbf{Input}: $\bbar{K}$, $\bu$, $\bv$, $\mb{y}$, $\mb{p}$ (quantities obtained via conventional manner as if there is no nonviscous damping)
+\State \textbf{Input}: $\bbf_n$, $\bbf$
+\State \textbf{Output}: $\bu$, $\bbf$
+\State compute $\bw$ from $\bv$
+\State \faMicrochip~compute revised stiffness $\bhat{K}=\bbar{K}+\dfrac{m\Delta{}t}{1+s\Delta{}t}\mb{T}\ddfrac{\bv}{\bu}$\Comment{\eqsref{eq:revised_k}}
+\State \faMicrochip~compute revised resistance $\bhat{y}=\mb{y}+\dfrac{1}{1+s\Delta{}t}\bbf_n+\dfrac{m\Delta{}t}{1+s\Delta{}t}\bw$\Comment{\eqsref{eq:revised_y}}
+\State $\delta\bu=\bhat{K}^{-1}\left(\mb{p}-\bhat{y}\right)$\Comment{\eqsref{eq:revised_system}}
+\State update $\bu\leftarrow\bu+\delta\bu$
+\State update $\bv$ according to updated $\bu$ via the specific time integration
+\State update $\bw$ according to updated $\bv$
+\State \faMicrochip~compute $\delta\bbf=-\bbf+\dfrac{1}{1+s\Delta{}t}\bbf_n+\dfrac{m\Delta{}t}{1+s\Delta{}t}\left(\bw+\mb{T}\ddfrac{\bv}{\bu}\delta\bu\right)$\Comment{\eqsref{eq:incre_f}}
+\State update $\bbf\leftarrow\bbf+\delta\bbf$
+\State \textbf{Return}: $\bu$, $\bbf$
+\end{algorithmic}
+\end{breakablealgorithm}
+The steps with a leading \faMicrochip~symbol indicates additional steps need to be computed compared to a conventional algorithm for nonviscously damped systems.
+\subsection{Complexity Analysis}
+The term $\mb{T}\ddfrac{\bv}{\bu}\delta\bu$ can be efficiently computed by masking $\delta\bu$ as $\mb{T}$ is a diagonal matrix while $\ddfrac{\bv}{\bu}$ can be equivalently converted into a scalar (see discussion before). Assuming the system has a size of $n$, it requires at most $n$ floating point number arithmetic. All three extra steps require pure vector operations, the total number of floating point number multiplications is $6n$, that is a time complexity of $\mathcal{O}\left(n\right)$.
+
+\algoref{algo:single_model} requires no memory reallocation, the additional storage needed is for the nonviscous damping forces $f_{n+1}$ and $f_n$, implying a space complexity of $\mathcal{O}\left(n\right)$.
+\section{Nonviscous Damping With Arbitrary Kernel}
+\subsection{Sum of Exponentials}
+Now consider, instead of a single exponential function, multiple exponential functions such that
+\begin{gather}
+g=\sum_{l=1}^{j}g_l\left(t\right)=\sum_{l=1}^{j}m_l\exp\left(-s_jt\right),
+\end{gather}
+then
+\begin{gather}\label{eq:single_conv}
+\bbf\left(t\right)=g*\bw=\sum_{l=1}^{j}g_l\left(t\right)*\bw=\sum_{l=1}^{j}\bbf_l.
+\end{gather}
+For each of $\bbf_l$, \eqsref{eq:discretised_b} also holds and only involves $\bbf_l$ itself and the common quantity $\bw$.
+
+The residual and Jacobian become
+\begin{gather}\label{eq:residual_multi}
+\mb{R}=\begin{bmatrix}
+\mb{Q}\\\mb{W}_1\\\mb{W}_2\\\vdots\\\mb{W}_j
+\end{bmatrix}=\left\{
+\begin{array}{l}
+\mb{y}+\sum\bbf_l-\mb{p},\\
+\left(1+s_1\Delta{}t\right)\bbf_1-\bbf_{1,n}-m_1\Delta{}t\bw,\\
+\left(1+s_2\Delta{}t\right)\bbf_2-\bbf_{2,n}-m_2\Delta{}t\bw,\\
+\cdots\\
+\left(1+s_j\Delta{}t\right)\bbf_j-\bbf_{j,n}-m_j\Delta{}t\bw,\\
+\end{array}
+\right.\\[4mm]\label{eq:jacobian_multi}
+\mb{J}=\begin{bmatrix}
+\bbar{K}&\mb{I}&\mb{I}&\cdots&\mb{I}\\[4mm]
+-m_1\Delta{}t\mb{T}\ddfrac{\bv}{\bu}&\left(1+s_1\Delta{}t\right)\mb{I}&\cdot&\cdots&\cdot\\[4mm]
+-m_2\Delta{}t\mb{T}\ddfrac{\bv}{\bu}&\cdot&\left(1+s_2\Delta{}t\right)\mb{I}&\cdots&\cdot\\[4mm]
+\vdots&\vdots&\vdots&\ddots&\vdots\\[4mm]
+-m_j\Delta{}t\mb{T}\ddfrac{\bv}{\bu}&\cdot&\cdot&\cdot&\left(1+s_j\Delta{}t\right)\mb{I}
+\end{bmatrix}.
+\end{gather}
+with the unknown quantity $\bx=\begin{bmatrix}
+\bu&\bbf_1&\bbf_2&\cdots&\bbf_j
+\end{bmatrix}^\mT$.
+
+Similar to the single function case, $\delta\bbf_l$ can be solved and substituted into the first expression, yielding the revised stiffness
+\begin{gather}\label{eq:revised_k_multi}
+\bhat{K}=\bbar{K}+\sum_{l=1}^{j}\dfrac{m_l\Delta{}t}{1+s_l\Delta{}t}\mb{T}\ddfrac{\bv}{\bu},
+\end{gather}
+and the revised resistance
+\begin{gather}\label{eq:revised_y_multi}
+\bhat{y}=\mb{y}+\sum_{l=1}^{j}\dfrac{1}{1+s_l\Delta{}t}\bbf_{l,n}+\sum_{l=1}^{j}\dfrac{m_l\Delta{}t}{1+s_l\Delta{}t}\bw.
+\end{gather}
+
+Noting that within each sum, the operations performed are identical to that in the single function case, the complexity in this case is $\mathcal{O}\left(jn\right)$ for both time and space.
+\subsection{Arbitrary Kernel}
+\citet{Gao2022} presented a method to approximate a given arbitrary function $g\left(t\right)$ with arbitrary accuracy within a given interval, using multiple exponential functions, that is
+\begin{gather}
+\max_{t\in{}I}{\abs{g\left(t\right)-\sum_jm_j\exp\left(-s_jt\right)}}<\epsilon,
+\end{gather}
+where $I$ is a finite interval that could be an arbitrary subset of $\mathbb{R}^+$, $\epsilon$ is the error tolerance.
+
+By assigning a tolerance close to (or less than) the machine error, an accurate equivalence of arbitrary kernel function can be obtained for nonviscous damping computation. In practice, such a tolerance only needs to be smaller than analysis tolerance.
