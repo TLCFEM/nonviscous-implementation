@@ -24,6 +24,6 @@
 *.bak
 *.sav.tmp
 *.synctex.gz
-NM.pdf
+NON.pdf
 venv
 .idea

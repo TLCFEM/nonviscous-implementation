@@ -34,7 +34,7 @@ The convolution can be then expressed as
 \begin{gather}\label{eq:single_conv}
 \bbf\left(t\right)=g*\bw=\int_0^tg(t-\tau)\cdot\bw\left(\tau\right)~\md{\tau}=\int_0^tm\exp\left(-s\left(t-\tau\right)\right)\cdot\bw\left(\tau\right)~\md{\tau}.
 \end{gather}
-Assuming trivial initial condition $\bv\left(0\right)=\mb{0}$, \eqsref{eq:single_conv} corresponds to the solution of the following ODE,
+\eqsref{eq:single_conv} corresponds to the solution of the following ODE \citep[see, e.g.,][\S~80]{Zwillinger2021},
 \begin{gather}\label{eq:single_conv_ode}
 \bbf'=-s\bbf+m\bw.
 \end{gather}
@@ -102,15 +102,19 @@ the final system to be solved is simply
 \begin{gather}\label{eq:revised_system}
 \bhat{K}\delta\bu=-\bhat{Q}.
 \end{gather}
-Furthermore, by expanding $\bhat{Q}$, one can obtain the revised resistance $\bhat{y}$ as
+Furthermore, by expanding $\bhat{Q}$, one can obtain the revised resistance $\bhat{y}$ such that
+\begin{gather}
+\bhat{Q}=\bhat{y}-\mb{q},
+\end{gather}
+with
 \begin{gather}\label{eq:revised_y}
 \bhat{y}=\mb{y}+\dfrac{1}{1+s\Delta{}t}\bbf_n+\dfrac{m\Delta{}t}{1+s\Delta{}t}\bw.
 \end{gather}
 
 The local iteration body is summarised in \algoref{algo:single_model}.
 \begin{breakablealgorithm}
-\setstretch{1.6}
-\caption{solving nonviscously damped system with one exponential kernel}\label{algo:single_model}
+\setstretch{1.8}
+\caption{iteration body of solving nonviscously damped system with one exponential kernel}\label{algo:single_model}
 \begin{algorithmic}
 \State \textbf{Input}: $\bbar{K}$, $\bu$, $\bv$, $\mb{y}$, $\mb{p}$ (quantities obtained via conventional manner as if there is no nonviscous damping)
 \State \textbf{Input}: $\bbf_n$, $\bbf$
@@ -120,14 +124,16 @@ The local iteration body is summarised in \algoref{algo:single_model}.
 \State \faMicrochip~compute revised resistance $\bhat{y}=\mb{y}+\dfrac{1}{1+s\Delta{}t}\bbf_n+\dfrac{m\Delta{}t}{1+s\Delta{}t}\bw$\Comment{\eqsref{eq:revised_y}}
 \State $\delta\bu=\bhat{K}^{-1}\left(\mb{p}-\bhat{y}\right)$\Comment{\eqsref{eq:revised_system}}
 \State update $\bu\leftarrow\bu+\delta\bu$
-\State update $\bv$ according to updated $\bu$ via the specific time integration
+\State update $\bv$ according to updated $\bu$ via the specific time integration method
 \State update $\bw$ according to updated $\bv$
-\State \faMicrochip~compute $\delta\bbf=-\bbf+\dfrac{1}{1+s\Delta{}t}\bbf_n+\dfrac{m\Delta{}t}{1+s\Delta{}t}\left(\bw+\mb{T}\ddfrac{\bv}{\bu}\delta\bu\right)$\Comment{\eqsref{eq:incre_f}}
-\State update $\bbf\leftarrow\bbf+\delta\bbf$
+\State $\delta\bw=\mb{T}\ddfrac{\bv}{\bu}\delta\bu$
+\State \faMicrochip~update $\bbf\leftarrow\bbf+\delta\bbf=\dfrac{1}{1+s\Delta{}t}\bbf_n+\dfrac{m\Delta{}t}{1+s\Delta{}t}\left(\bw+\delta\bw\right)$\Comment{\eqsref{eq:incre_f}}
 \State \textbf{Return}: $\bu$, $\bbf$
 \end{algorithmic}
 \end{breakablealgorithm}
-The steps with a leading \faMicrochip~symbol indicates additional steps need to be computed compared to a conventional algorithm for nonviscously damped systems.
+The steps with a leading \faMicrochip~symbol indicates additional steps that need to be computed compared to a conventional algorithm for nonviscously damped systems, namely: 1) augment global effective stiffness and resistance to obtain $\bhat{K}$ and $\bhat{y}$, and 2) store the history of nonviscous damping force $\bbf$.
+
+Unlike other algorithms, such as the one by \citet{Cortes2009}, \algoref{algo:single_model} does not impose additional requirements to the time integration method used.
 \subsection{Complexity Analysis}
 The term $\mb{T}\ddfrac{\bv}{\bu}\delta\bu$ can be efficiently computed by masking $\delta\bu$ as $\mb{T}$ is a diagonal matrix while $\ddfrac{\bv}{\bu}$ can be equivalently converted into a scalar (see discussion before). Assuming the system has a size of $n$, it requires at most $n$ floating point number arithmetic. All three extra steps require pure vector operations, the total number of floating point number multiplications is $6n$, that is a time complexity of $\mathcal{O}\left(n\right)$.
 
@@ -135,11 +141,11 @@ The term $\mb{T}\ddfrac{\bv}{\bu}\delta\bu$ can be efficiently computed by maski
 \section{Nonviscous Damping With Arbitrary Kernel}
 \subsection{Sum of Exponentials}
 Now consider, instead of a single exponential function, multiple exponential functions such that
-\begin{gather}
-g=\sum_{l=1}^{j}g_l\left(t\right)=\sum_{l=1}^{j}m_l\exp\left(-s_jt\right),
+\begin{gather}\label{eq:sum_exp}
+g=\sum_{l=1}^{j}g_l\left(t\right)=\sum_{l=1}^{j}m_l\exp\left(-s_lt\right),
 \end{gather}
-then
-\begin{gather}\label{eq:single_conv}
+where $m_l$ and $s_l$ can be complex numbers, then
+\begin{gather}\label{eq:sum_conv}
 \bbf\left(t\right)=g*\bw=\sum_{l=1}^{j}g_l\left(t\right)*\bw=\sum_{l=1}^{j}\bbf_l.
 \end{gather}
 For each of $\bbf_l$, \eqsref{eq:discretised_b} also holds and only involves $\bbf_l$ itself and the common quantity $\bw$.
@@ -187,3 +193,24 @@ Noting that within each sum, the operations performed are identical to that in t
 where $I$ is a finite interval that could be an arbitrary subset of $\mathbb{R}^+$, $\epsilon$ is the error tolerance.
 
 By assigning a tolerance close to (or less than) the machine error, an accurate equivalence of arbitrary kernel function can be obtained for nonviscous damping computation. In practice, such a tolerance only needs to be smaller than analysis tolerance.
+\subsection{Composition of Damping}
+It is possible to further assign multiple arbitrary kernels to different subsets of velocity vector. Formally,
+\begin{gather}
+\bbf=\sum_{k=1}^{i}g^k\bw^k,
+\end{gather}
+where $g^k$ is the arbitrary kernel applied to $\bw^k$,
+\begin{gather}
+g^k=\sum_{l=1}^{j^k}g_l^k\left(t\right)=\sum_{l=1}^{j^k}m_l^k\exp\left(-s_l^kt\right),
+\end{gather}
+in its explicit form
+\begin{gather}\label{eq:composition}
+\bbf=\sum_{k=1}^{i}\sum_{l=1}^{j^k}\bbf_l^k=\sum_{k=1}^{i}\sum_{l=1}^{j^k}g_l^k\left(t\right)\bw^k=\sum_{k=1}^{i}\sum_{l=1}^{j^k}m_l^k\exp\left(-s_l^kt\right)\bw^k.
+\end{gather}
+
+Since additivity still holds, there is no essential difference between \eqsref{eq:sum_exp} and \eqsref{eq:composition}. $m_l^k$ and $s_l^k$ are parameters for $l$-th component of $k$-th kernel. $\bw^k=\mb{T}^k\bv$ can be obtained by either node-based or element-based rules. For the former, it is assumed different regions (characterised by nodes) possess different damping response. For the latter, it is assumed different elements possess different damping response, similar to a typical assembly process. No matter how $\bw^k$ is constructed, the revised stiffness and resistance for each $\bbf_l^k$ only require vector--scalar operation.
+
+Denoting
+\begin{gather}
+j^\text{max}=\max_{k\in\{1,2,\cdots,i\}}\left(j^k\right),
+\end{gather}
+the time and space complexity is $\mathcal{O}\left(ij^\text{max}n\right)$.
