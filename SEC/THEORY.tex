@@ -42,44 +42,31 @@ It can be validated by solving \eqsref{eq:single_conv_ode} with the assist of th
 \subsection{An Efficient Algorithm}
 Instead of directly integrating \eqsref{eq:single_conv} using higher-order methods (such as the Runge--Kutta family), \eqsref{eq:single_conv_ode} can be combined with \eqsref{eq:eom} to develop an efficient algorithm.
 
-Given that popular time integration methods are of second order accuracy, in the context of a discretised iterative solving schema, \eqsref{eq:single_conv_ode} can be rewritten as follows using the trapezoidal rule, which is second order accurate, accordingly,
+Given that popular time integration methods are of second order accuracy, in the context of a discretised iterative solving schema, \eqsref{eq:single_conv_ode} can be rewritten as follows using the trapezoidal rule, which is second order accurate,
 \begin{gather}
 \bbf_{n+1}=\bbf_n+\dfrac{\Delta{}t}{2}\left(\bbf_n'+\bbf_{n+1}'\right).
 \end{gather}
 Expanding and rearranging lead to
-\begin{gather}
-\bbf_{n+1}=\dfrac{2-s\Delta{}t}{2+s\Delta{}t}\bbf_n+\dfrac{m\Delta{}t}{2+s\Delta{}t}\bw_n+\dfrac{m\Delta{}t}{2+s\Delta{}t}\bw_{n+1}
-\end{gather}
-
-In the context of a discretised iterative solving scheme, \eqsref{eq:single_conv_ode} can be rewritten as follows using the backward (implicit) Euler method,
-\begin{gather}\label{eq:discretised_a}
-\dfrac{\bbf_{n+1}-\bbf_n}{\Delta{}t}=-s\bbf_{n+1}+m\bw_{n+1},
+\begin{gather}\label{eq:discretised_c}
+\bbf_{n+1}=\dfrac{2-s\Delta{}t}{2+s\Delta{}t}\bbf_n+\dfrac{m\Delta{}t}{2+s\Delta{}t}\bw_n+\dfrac{m\Delta{}t}{2+s\Delta{}t}\bw_{n+1},
 \end{gather}
 in which subscripts $\left(\cdot\right)_{n+1}$ and $\left(\cdot\right)_n$ denote the corresponding quantity at $t_n$ and $t_{n+1}=t_n+\Delta{}t$.
-Rearranging \eqsref{eq:discretised_a} yields
-\begin{gather}\label{eq:discretised_b}
-\left(1+s\Delta{}t\right)\bbf_{n+1}-\bbf_n-m\Delta{}t\bw_{n+1},
-\end{gather}
-thus
-\begin{gather}\label{eq:discretised_c}
-\bbf_{n+1}=\dfrac{1}{1+s\Delta{}t}\bbf_n+\dfrac{m\Delta{}t}{1+s\Delta{}t}\bw_{n+1}.
-\end{gather}
 
 It must be pointed out that the idea to introduce an internal variable is similar to the approach presented by \citet[][see \S~4.3]{Adhikari2014}. In this work, instead of the filtered velocity \citep[][see Eq. 4.23]{Adhikari2014}, the nonviscous damping force is chosen as the internal variable, which, as can be seen later, eventually leads to a system that can be effectively solved.
 
 Assuming \eqsref{eq:eom} is satisfied at $t_{n+1}$\footnote{This assumption is not always valid as some time integration methods establish the EOM elsewhere, see, for example, the generalised-$\alpha$ method, the GSSSS method, the Bathe two-step method, the OALTS method, etc.}, then, accounting for \eqsref{eq:discretised_c}, \eqsref{eq:eom} (with the subscript $\left(\cdot\right)_{n+1}$ dropped for brevity) is
 \begin{gather}\label{eq:residual}
-\mb{y}+\dfrac{1}{1+s\Delta{}t}\bbf_n+\dfrac{m\Delta{}t}{1+s\Delta{}t}\bw=\mb{p}.
+\mb{y}+\dfrac{2-s\Delta{}t}{2+s\Delta{}t}\bbf_n+\dfrac{m\Delta{}t}{2+s\Delta{}t}\bw_n+\dfrac{m\Delta{}t}{2+s\Delta{}t}\bw=\mb{p}.
 \end{gather}
 Differentiation leads to the following revised effective stiffness $\bhat{K}$,
 \begin{gather}\label{eq:revised_k}
-\bhat{K}=\bbar{K}+\dfrac{m\Delta{}t}{1+s\Delta{}t}\mb{T}\ddfrac{\bv}{\bu}.
+\bhat{K}=\bbar{K}+\dfrac{m\Delta{}t}{2+s\Delta{}t}\mb{T}\ddfrac{\bv}{\bu}.
 \end{gather}
 Typically, $\ddfrac{\bv}{\bu}$ reduces to a scalar constant (multiplied by an identity matrix), for example, in the Newmark method, it is $\dfrac{\gamma}{\beta\Delta{}t}$.
 
 By introducing the revised resistance $\bhat{y}$ as
 \begin{gather}\label{eq:revised_y}
-\bhat{y}=\mb{y}+\dfrac{1}{1+s\Delta{}t}\bbf_n+\dfrac{m\Delta{}t}{1+s\Delta{}t}\bw,
+\bhat{y}=\mb{y}+\dfrac{2-s\Delta{}t}{2+s\Delta{}t}\bbf_n+\dfrac{m\Delta{}t}{2+s\Delta{}t}\bw_n+\dfrac{m\Delta{}t}{2+s\Delta{}t}\bw,
 \end{gather}
 the final system to be solved is
 \begin{gather}\label{eq:revised_system}
@@ -94,8 +81,8 @@ The local iteration body is summarised in \algoref{algo:single_model}.
 \State \textbf{Input}: $\bbar{K}$, $\bu$, $\bv$, $\mb{y}$, $\mb{p}$ (quantities obtained via conventional manner as if there is no nonviscous damping) and $\bbf_n$
 \State \textbf{Output}: $\bu$
 \State compute $\bw$ from $\bv$
-\State \faMicrochip~compute revised stiffness $\bhat{K}=\bbar{K}+\dfrac{m\Delta{}t}{1+s\Delta{}t}\mb{T}\ddfrac{\bv}{\bu}$\Comment{\eqsref{eq:revised_k}}
-\State \faMicrochip~compute revised resistance $\bhat{y}=\mb{y}+\dfrac{1}{1+s\Delta{}t}\bbf_n+\dfrac{m\Delta{}t}{1+s\Delta{}t}\bw$\Comment{\eqsref{eq:revised_y}}
+\State \faMicrochip~compute revised stiffness $\bhat{K}=\bbar{K}+\dfrac{m\Delta{}t}{2+s\Delta{}t}\mb{T}\ddfrac{\bv}{\bu}$\Comment{\eqsref{eq:revised_k}}
+\State \faMicrochip~compute revised resistance $\bhat{y}=\mb{y}+\dfrac{2-s\Delta{}t}{2+s\Delta{}t}\bbf_n+\dfrac{m\Delta{}t}{2+s\Delta{}t}\bw_n+\dfrac{m\Delta{}t}{2+s\Delta{}t}\bw$\Comment{\eqsref{eq:revised_y}}
 \State $\delta\bu=\bhat{K}^{-1}\left(\mb{p}-\bhat{y}\right)$\Comment{\eqsref{eq:revised_system}}
 \State update and return $\bu\leftarrow\bu+\delta\bu$
 \end{algorithmic}
@@ -104,7 +91,7 @@ The steps with a leading \faMicrochip~symbol augment global effective stiffness 
 
 Unlike other algorithms, such as the one by \citet{Cortes2009}, \algoref{algo:single_model} does not impose additional requirements to the time integration method used.
 \subsection{Complexity Analysis}
-The term $\mb{T}\ddfrac{\bv}{\bu}\delta\bu$ can be efficiently computed by masking $\delta\bu$ as $\mb{T}$ is a diagonal matrix while $\ddfrac{\bv}{\bu}$ can be equivalently converted into a scalar (see discussion before). Assuming the system has a size of $n$, it requires at most $n$ floating point number arithmetic. All three extra steps require pure vector operations, the total number of floating point number multiplications is $6n$, that is a time complexity of $\mathcal{O}\left(n\right)$.
+The term $\mb{T}\ddfrac{\bv}{\bu}\delta\bu$ can be efficiently computed by masking $\delta\bu$ as $\mb{T}$ is a diagonal matrix while $\ddfrac{\bv}{\bu}$ can be equivalently converted into a scalar (see discussion before). Assuming the system has a size of $n$, it requires at most $n$ floating point number arithmetic. All three extra steps require pure vector operations, the total number of floating point number multiplications is $4n$, that is a time complexity of $\mathcal{O}\left(n\right)$.
 
 \algoref{algo:single_model} requires no memory reallocation, the additional storage needed is for the nonviscous damping forces $f_n$, implying a space complexity of $\mathcal{O}\left(n\right)$.
 \section{Nonviscous Damping With Arbitrary Kernel}
@@ -117,18 +104,18 @@ where $m_l$ and $s_l$ can be complex numbers, then
 \begin{gather}\label{eq:sum_conv}
 \bbf\left(t\right)=g*\bw=\sum_{l=1}^{j}g_l\left(t\right)*\bw=\sum_{l=1}^{j}\bbf_l.
 \end{gather}
-For each of $\bbf_l$, \eqsref{eq:discretised_b} also holds and only involves $\bbf_l$ itself and the common quantity $\bw$. Thus,
+For each of $\bbf_l$, \eqsref{eq:discretised_c} also holds and only involves $\bbf_l$ itself and the common quantity $\bw$. Thus,
 \begin{gather}
-\bbf_l=\dfrac{1}{1+s_l\Delta{}t}\bbf_{l,n}+\dfrac{m_l\Delta{}t}{1+s_l\Delta{}t}\bw.
+\bbf_l=\dfrac{2-s_l\Delta{}t}{2+s_l\Delta{}t}\bbf_n+\dfrac{m_l\Delta{}t}{2+s_l\Delta{}t}\bw_n+\dfrac{m_l\Delta{}t}{2+s_l\Delta{}t}\bw.
 \end{gather}
 
 Similar to the single function case, substituting $\bbf_l$ into \eqsref{eq:eom}, differentiation yields the revised stiffness
 \begin{gather}\label{eq:revised_k_multi}
-\bhat{K}=\bbar{K}+\sum_{l=1}^{j}\dfrac{m_l\Delta{}t}{1+s_l\Delta{}t}\mb{T}\ddfrac{\bv}{\bu},
+\bhat{K}=\bbar{K}+\sum_{l=1}^{j}\dfrac{m_l\Delta{}t}{2+s_l\Delta{}t}\mb{T}\ddfrac{\bv}{\bu},
 \end{gather}
 and the revised resistance
 \begin{gather}\label{eq:revised_y_multi}
-\bhat{y}=\mb{y}+\sum_{l=1}^{j}\dfrac{1}{1+s_l\Delta{}t}\bbf_{l,n}+\sum_{l=1}^{j}\dfrac{m_l\Delta{}t}{1+s_l\Delta{}t}\bw.
+\bhat{y}=\mb{y}+\sum_{l=1}^{j}\dfrac{2-s_l\Delta{}t}{2+s_l\Delta{}t}\bbf_n+\sum_{l=1}^{j}\dfrac{m_l\Delta{}t}{2+s_l\Delta{}t}\bw_n+\sum_{l=1}^{j}\dfrac{m_l\Delta{}t}{2+s_l\Delta{}t}\bw.
 \end{gather}
 
 Noting that within each sum, the operations performed are identical to that in the single function case, the complexity in this case is $\mathcal{O}\left(jn\right)$ for both time and space.
