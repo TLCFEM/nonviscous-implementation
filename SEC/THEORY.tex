@@ -49,66 +49,32 @@ In the context of a discretised iterative solving schema, \eqsref{eq:single_conv
 in which subscripts $\left(\cdot\right)_{n+1}$ and $\left(\cdot\right)_n$ denote the corresponding quantity at $t_n$ and $t_{n+1}=t_n+\Delta{}t$.
 Rearranging \eqsref{eq:discretised_a} yields
 \begin{gather}\label{eq:discretised_b}
-\left(1+s\Delta{}t\right)\bbf_{n+1}-\bbf_n-m\Delta{}t\bw_{n+1}.
+\left(1+s\Delta{}t\right)\bbf_{n+1}-\bbf_n-m\Delta{}t\bw_{n+1},
+\end{gather}
+thus
+\begin{gather}\label{eq:discretised_c}
+\bbf_{n+1}=\dfrac{1}{1+s\Delta{}t}\bbf_n+\dfrac{m\Delta{}t}{1+s\Delta{}t}\bw_{n+1}.
 \end{gather}
 
-Assuming \eqsref{eq:eom} is satisfied at $t_{n+1}$\footnote{This assumption is not always valid as some time integration methods establish the EOM elsewhere, see, for example, the generalised-$\alpha$ method, the GSSSS method, the Bathe two-step method, the OALTS method, etc.}, then, accounting for both \eqsref{eq:eom} and \eqsref{eq:discretised_b}, the residual $\mb{R}$ (with the subscript $\left(\cdot\right)_{n+1}$ dropped for brevity) is
+It must be pointed out that the idea to introduce an internal variable is similar to the approach presented by \citet[][see \S~4.3]{Adhikari2014}. In this work, instead of the filtered velocity \citep[][see Eq. 4.23]{Adhikari2014}, the nonviscous damping force is chosen as the internal variable, which, as can be seen later, eventually leads to a system that can be effectively solved.
+
+Assuming \eqsref{eq:eom} is satisfied at $t_{n+1}$\footnote{This assumption is not always valid as some time integration methods establish the EOM elsewhere, see, for example, the generalised-$\alpha$ method, the GSSSS method, the Bathe two-step method, the OALTS method, etc.}, then, accounting for \eqsref{eq:discretised_c}, \eqsref{eq:eom} (with the subscript $\left(\cdot\right)_{n+1}$ dropped for brevity) is
 \begin{gather}\label{eq:residual}
-\mb{R}=\begin{bmatrix}
-\mb{Q}\\\mb{W}
-\end{bmatrix}=\left\{
-\begin{array}{l}
-\mb{y}+\bbf-\mb{p},\\
-\left(1+s\Delta{}t\right)\bbf-\bbf_n-m\Delta{}t\bw.
-\end{array}
-\right.
+\mb{y}+\dfrac{1}{1+s\Delta{}t}\bbf_n+\dfrac{m\Delta{}t}{1+s\Delta{}t}\bw=\mb{p}.
 \end{gather}
-The unknown quantity is $\bx=\begin{bmatrix}
-\bu&\bbf
-\end{bmatrix}^\mT$. Linearisation results in the following Jacobian.
-\begin{gather}
-\mb{J}=\begin{bmatrix}
-\pdfrac{\mb{Q}}{\bu}&\pdfrac{\mb{Q}}{\bbf}\\[4mm]
-\pdfrac{\mb{W}}{\bu}&\pdfrac{\mb{W}}{\bbf}
-\end{bmatrix}=\begin{bmatrix}
-\bbar{K}&\mb{I}\\[4mm]
--m\Delta{}t\mb{T}\ddfrac{\bv}{\bu}&\left(1+s\Delta{}t\right)\mb{I}
-\end{bmatrix}.
+Differentiation leads to the following revised effective stiffness $\bhat{K}$,
+\begin{gather}\label{eq:revised_k}
+\bhat{K}=\bbar{K}+\dfrac{m\Delta{}t}{1+s\Delta{}t}\mb{T}\ddfrac{\bv}{\bu}.
 \end{gather}
 Typically, $\ddfrac{\bv}{\bu}$ reduces to a scalar constant (multiplied by an identity matrix), for example, in the Newmark method, it is $\dfrac{\gamma}{\beta\Delta{}t}$.
 
-Noting that $\pdfrac{\mb{W}}{\bbf}$ is a diagonal matrix that can be easily inverted, there is no need to explicitly formulate the Jacobian, which would require memory reallocation and unnecessary memory copy. Instead, one could perform static condensation such that, from the second expression in \eqsref{eq:residual},
-\begin{gather}
--m\Delta{}t\mb{T}\ddfrac{\bv}{\bu}\delta\bu+\left(1+s\Delta{}t\right)\delta\bbf=-\mb{W},
-\end{gather}
-the increment $\delta\bbf$ is
-\begin{gather}\label{eq:incre_f}
-\delta\bbf=\dfrac{1}{1+s\Delta{}t}\left(-\mb{W}+m\Delta{}t\mb{T}\ddfrac{\bv}{\bu}\delta\bu\right),
-\end{gather}
-substituting it into the first expression yields
-\begin{gather}
-\bbar{K}\delta\bu+\dfrac{1}{1+s\Delta{}t}\left(-\mb{W}+m\Delta{}t\mb{T}\ddfrac{\bv}{\bu}\delta\bu\right)=-\mb{Q}.
-\end{gather}
-Rearranging gives
-\begin{gather}
-\left(\bbar{K}+\dfrac{m\Delta{}t}{1+s\Delta{}t}\mb{T}\ddfrac{\bv}{\bu}\right)\delta\bu=-\left(\mb{Q}-\dfrac{1}{1+s\Delta{}t}\mb{W}\right).
-\end{gather}
-By denoting
-\begin{gather}\label{eq:revised_k}
-\bhat{K}=\bbar{K}+\dfrac{m\Delta{}t}{1+s\Delta{}t}\mb{T}\ddfrac{\bv}{\bu},\\
-\bhat{Q}=\mb{Q}-\dfrac{1}{1+s\Delta{}t}\mb{W},
-\end{gather}
-the final system to be solved is simply
-\begin{gather}\label{eq:revised_system}
-\bhat{K}\delta\bu=-\bhat{Q}.
-\end{gather}
-Furthermore, by expanding $\bhat{Q}$, one can obtain the revised resistance $\bhat{y}$ such that
-\begin{gather}
-\bhat{Q}=\bhat{y}-\mb{q},
-\end{gather}
-with
+By introducing the revised resistance $\bhat{y}$ as
 \begin{gather}\label{eq:revised_y}
-\bhat{y}=\mb{y}+\dfrac{1}{1+s\Delta{}t}\bbf_n+\dfrac{m\Delta{}t}{1+s\Delta{}t}\bw.
+\bhat{y}=\mb{y}+\dfrac{1}{1+s\Delta{}t}\bbf_n+\dfrac{m\Delta{}t}{1+s\Delta{}t}\bw,
+\end{gather}
+the final system to be solved is
+\begin{gather}\label{eq:revised_system}
+\bhat{K}\delta\bu=\mb{q}-\bhat{y}.
 \end{gather}
 
 The local iteration body is summarised in \algoref{algo:single_model}.
@@ -116,28 +82,22 @@ The local iteration body is summarised in \algoref{algo:single_model}.
 \setstretch{1.8}
 \caption{iteration body of solving nonviscously damped system with one exponential kernel}\label{algo:single_model}
 \begin{algorithmic}
-\State \textbf{Input}: $\bbar{K}$, $\bu$, $\bv$, $\mb{y}$, $\mb{p}$ (quantities obtained via conventional manner as if there is no nonviscous damping)
-\State \textbf{Input}: $\bbf_n$, $\bbf$
-\State \textbf{Output}: $\bu$, $\bbf$
+\State \textbf{Input}: $\bbar{K}$, $\bu$, $\bv$, $\mb{y}$, $\mb{p}$ (quantities obtained via conventional manner as if there is no nonviscous damping) and $\bbf_n$
+\State \textbf{Output}: $\bu$
 \State compute $\bw$ from $\bv$
 \State \faMicrochip~compute revised stiffness $\bhat{K}=\bbar{K}+\dfrac{m\Delta{}t}{1+s\Delta{}t}\mb{T}\ddfrac{\bv}{\bu}$\Comment{\eqsref{eq:revised_k}}
 \State \faMicrochip~compute revised resistance $\bhat{y}=\mb{y}+\dfrac{1}{1+s\Delta{}t}\bbf_n+\dfrac{m\Delta{}t}{1+s\Delta{}t}\bw$\Comment{\eqsref{eq:revised_y}}
 \State $\delta\bu=\bhat{K}^{-1}\left(\mb{p}-\bhat{y}\right)$\Comment{\eqsref{eq:revised_system}}
-\State update $\bu\leftarrow\bu+\delta\bu$
-\State update $\bv$ according to updated $\bu$ via the specific time integration method
-\State update $\bw$ according to updated $\bv$
-\State $\delta\bw=\mb{T}\ddfrac{\bv}{\bu}\delta\bu$
-\State \faMicrochip~update $\bbf\leftarrow\bbf+\delta\bbf=\dfrac{1}{1+s\Delta{}t}\bbf_n+\dfrac{m\Delta{}t}{1+s\Delta{}t}\left(\bw+\delta\bw\right)$\Comment{\eqsref{eq:incre_f}}
-\State \textbf{Return}: $\bu$, $\bbf$
+\State update and return $\bu\leftarrow\bu+\delta\bu$
 \end{algorithmic}
 \end{breakablealgorithm}
-The steps with a leading \faMicrochip~symbol indicates additional steps that need to be computed compared to a conventional algorithm for nonviscously damped systems, namely: 1) augment global effective stiffness and resistance to obtain $\bhat{K}$ and $\bhat{y}$, and 2) store the history of nonviscous damping force $\bbf$.
+The steps with a leading \faMicrochip~symbol augment global effective stiffness and resistance to obtain $\bhat{K}$ and $\bhat{y}$. Those are additional steps that need to be computed compared to a conventional algorithm for nonviscously damped systems. Once convergence is achieved, it is necessary to store the history of nonviscous damping force $\bbf_n\leftarrow\bbf$.
 
 Unlike other algorithms, such as the one by \citet{Cortes2009}, \algoref{algo:single_model} does not impose additional requirements to the time integration method used.
 \subsection{Complexity Analysis}
 The term $\mb{T}\ddfrac{\bv}{\bu}\delta\bu$ can be efficiently computed by masking $\delta\bu$ as $\mb{T}$ is a diagonal matrix while $\ddfrac{\bv}{\bu}$ can be equivalently converted into a scalar (see discussion before). Assuming the system has a size of $n$, it requires at most $n$ floating point number arithmetic. All three extra steps require pure vector operations, the total number of floating point number multiplications is $6n$, that is a time complexity of $\mathcal{O}\left(n\right)$.
 
-\algoref{algo:single_model} requires no memory reallocation, the additional storage needed is for the nonviscous damping forces $f_{n+1}$ and $f_n$, implying a space complexity of $\mathcal{O}\left(n\right)$.
+\algoref{algo:single_model} requires no memory reallocation, the additional storage needed is for the nonviscous damping forces $f_n$, implying a space complexity of $\mathcal{O}\left(n\right)$.
 \section{Nonviscous Damping With Arbitrary Kernel}
 \subsection{Sum of Exponentials}
 Now consider, instead of a single exponential function, multiple exponential functions such that
@@ -148,34 +108,12 @@ where $m_l$ and $s_l$ can be complex numbers, then
 \begin{gather}\label{eq:sum_conv}
 \bbf\left(t\right)=g*\bw=\sum_{l=1}^{j}g_l\left(t\right)*\bw=\sum_{l=1}^{j}\bbf_l.
 \end{gather}
-For each of $\bbf_l$, \eqsref{eq:discretised_b} also holds and only involves $\bbf_l$ itself and the common quantity $\bw$.
-
-The residual and Jacobian become
-\begin{gather}\label{eq:residual_multi}
-\mb{R}=\begin{bmatrix}
-\mb{Q}\\\mb{W}_1\\\mb{W}_2\\\vdots\\\mb{W}_j
-\end{bmatrix}=\left\{
-\begin{array}{l}
-\mb{y}+\sum\bbf_l-\mb{p},\\
-\left(1+s_1\Delta{}t\right)\bbf_1-\bbf_{1,n}-m_1\Delta{}t\bw,\\
-\left(1+s_2\Delta{}t\right)\bbf_2-\bbf_{2,n}-m_2\Delta{}t\bw,\\
-\cdots\\
-\left(1+s_j\Delta{}t\right)\bbf_j-\bbf_{j,n}-m_j\Delta{}t\bw,\\
-\end{array}
-\right.\\[4mm]\label{eq:jacobian_multi}
-\mb{J}=\begin{bmatrix}
-\bbar{K}&\mb{I}&\mb{I}&\cdots&\mb{I}\\[4mm]
--m_1\Delta{}t\mb{T}\ddfrac{\bv}{\bu}&\left(1+s_1\Delta{}t\right)\mb{I}&\cdot&\cdots&\cdot\\[4mm]
--m_2\Delta{}t\mb{T}\ddfrac{\bv}{\bu}&\cdot&\left(1+s_2\Delta{}t\right)\mb{I}&\cdots&\cdot\\[4mm]
-\vdots&\vdots&\vdots&\ddots&\vdots\\[4mm]
--m_j\Delta{}t\mb{T}\ddfrac{\bv}{\bu}&\cdot&\cdot&\cdot&\left(1+s_j\Delta{}t\right)\mb{I}
-\end{bmatrix}.
+For each of $\bbf_l$, \eqsref{eq:discretised_b} also holds and only involves $\bbf_l$ itself and the common quantity $\bw$. Thus,
+\begin{gather}
+\bbf_l=\dfrac{1}{1+s_l\Delta{}t}\bbf_{l,n}+\dfrac{m_l\Delta{}t}{1+s_l\Delta{}t}\bw.
 \end{gather}
-with the unknown quantity $\bx=\begin{bmatrix}
-\bu&\bbf_1&\bbf_2&\cdots&\bbf_j
-\end{bmatrix}^\mT$.
 
-Similar to the single function case, $\delta\bbf_l$ can be solved and substituted into the first expression, yielding the revised stiffness
+Similar to the single function case, substituting $\bbf_l$ into \eqsref{eq:eom}, differentiation yields the revised stiffness
 \begin{gather}\label{eq:revised_k_multi}
 \bhat{K}=\bbar{K}+\sum_{l=1}^{j}\dfrac{m_l\Delta{}t}{1+s_l\Delta{}t}\mb{T}\ddfrac{\bv}{\bu},
 \end{gather}
