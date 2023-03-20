@@ -42,7 +42,20 @@ It can be validated by solving \eqsref{eq:single_conv_ode} with the assist of th
 \subsection{An Efficient Algorithm}
 Instead of directly integrating \eqsref{eq:single_conv} using higher-order methods (such as the Runge--Kutta family), \eqsref{eq:single_conv_ode} can be combined with \eqsref{eq:eom} to develop an efficient algorithm.
 
-In the context of a discretised iterative solving schema, \eqsref{eq:single_conv_ode} can be rewritten as follows using the backward (implicit) Euler method,
+Given that popular time integration methods are of second order accuracy, in the context of a discretised iterative solving schema, \eqsref{eq:single_conv_ode} can be rewritten as follows using Heun's method, which is second order accurate, accordingly,
+\begin{gather}
+\tilde{\bbf}_{n+1}=\bbf_n+\Delta{}t\left(-s\bbf_n+m\bw_n\right),\\
+\bbf_{n+1}=\bbf_n+\dfrac{\Delta{}t}{2}\left(-s\bbf_n+m\bw_n-s\tilde{\bbf}_{n+1}+m\bw_{n+1}\right).
+\end{gather}
+Expanding and rearranging lead to
+\begin{gather}
+\bbf_{n+1}=
+\left(1-s\Delta{}t+\dfrac{s^2\Delta{}t^2}{2}\right)\bbf_n
++\dfrac{m\Delta{}t}{2}\left(1-s\Delta{}t\right)\bw_n
++\dfrac{m\Delta{}t}{2}\bw_{n+1}.
+\end{gather}
+
+In the context of a discretised iterative solving scheme, \eqsref{eq:single_conv_ode} can be rewritten as follows using the backward (implicit) Euler method,
 \begin{gather}\label{eq:discretised_a}
 \dfrac{\bbf_{n+1}-\bbf_n}{\Delta{}t}=-s\bbf_{n+1}+m\bw_{n+1},
 \end{gather}
