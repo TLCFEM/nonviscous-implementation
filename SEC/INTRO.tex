@@ -1,1 +1,22 @@
 \section{Introduction}
+The equation of motion of nonviscously damped systems can be, conventionally, expressed as an integro-differential equation, namely, for elastic linear single degree of freedom systems,
+\begin{gather}\label{eq:single_eom}
+m\ddot{u}\left(t\right)+\left(g*\dot{u}\right)\left(t\right)+ku\left(t\right)=p\left(t\right),
+\end{gather}
+where $u(t)$ denotes the displacement, $\dot{(\cdot)}$ denotes time derivative, and $g=g(t)$ is the kernel function. Various forms have been proposed, see a brief summary by \citet[][Table 1.1]{Adhikari2014}.
+
+The convolution term in \eqsref{eq:single_eom} can be expressed in integral form such that
+\begin{gather}\label{eq:conv}
+\left(g*\dot{u}\right)\left(t\right)=\int_0^tg\left(t-\tau\right)\dot{u}\left(\tau\right)\md{\tau}.
+\end{gather}
+Approaches to compute (or approximate, depending on one's perspective) it can be divided into two main categories:
+\begin{enumerate}
+\item Time Domain Methods\\
+Since $g(t)$ is known, assume $\dot{u}(t)$ history is already obtained, \eqsref{eq:conv} can be numerically integrated for a given $t=T$ such that
+\begin{gather}
+\int_0^Tg\left(T-\tau\right)\dot{u}\left(\tau\right)\md{\tau}\approx\sum_i^n\omega_ig\left(T-t_i\right)\dot{u}\left(t_i\right),
+\end{gather}
+where $t_i=\left\{t_0,t_1,t_2,\cdots,t_n\right\}\in[0,T]$ that can be either evenly or unevenly spaced, and $\omega_i$ is the corresponding integration weight. If the exact $\dot{u}(t_i)$ is available, approximations (linear interpolation, weighted sum, etc.) based on adjacent known values are often adopted.
+\item Frequency Domain Methods\\
+\eqsref{eq:single_eom} can be equivalently expressed in the frequency domain via Laplace transform. For some kernels, analytical solutions can be found and converted back to the time domain.
+\end{enumerate}

@@ -4,7 +4,7 @@ Consider the equation of motion of a nonviscously damped inelastic multi-degree-
 \begin{gather}\label{eq:eom}
 \mb{y}\left(\bu,\bv,\ba\right)+\bbf\left(t\right)=\mb{p}\left(t\right),
 \end{gather}
-where $\bu=\bu\left(t\right)$, $\bv=\bv\left(t\right)=\dot{\bu}$ and $\ba=\ba\left(t\right)=\dot{\bv}$ are the displacement, velocity and acceleration vectors, $\mb{y}=\mb{y}\left(\bu,\bv,\ba\right)$ is the resistance vector of the system, $\mb{p}=\mb{p}\left(t\right)$ is the external load vector, and $\bbf$ is the nonviscous damping force which can be expressed in the form of the convolution of the kernel $g=g\left(t\right)$ and the vector $\bw$, viz. $\bbf\left(t\right)=g*\bw$.
+where $\bu=\bu\left(t\right)$, $\bv=\bv\left(t\right)=\dot{\bu}$ and $\ba=\ba\left(t\right)=\dot{\bv}$ are the displacement, velocity and acceleration vectors, $\mb{y}=\mb{y}\left(\bu,\bv,\ba\right)$ is the resistance vector of the system, $\mb{p}=\mb{p}\left(t\right)$ is the external load vector, and $\bbf$ is the nonviscous damping force which can be expressed in the form of the convolution of the kernel $g=g\left(t\right)$ and the vector $\bw$, viz., $\bbf\left(t\right)=g*\bw$.
 
 Note here, $\bw$ can be either the exact velocity vector $\bv$, or the subset of $\bv$ such that they share the same size but some velocity components in $\bv$ are replaced by zeros in $\bw$ on selected DoFs. This is beneficial when it comes to compositing flexible damping that will be discussed later in this work. Formally, it can be represented by
 \begin{gather}
@@ -36,7 +36,7 @@ The convolution can be then expressed as
 \end{gather}
 \eqsref{eq:single_conv} corresponds to the solution of the following ODE \citep[see, e.g.,][\S~80]{Zwillinger2021},
 \begin{gather}\label{eq:single_conv_ode}
-\bbf'=-s\bbf+m\bw.
+\dot{\bbf}=-s\bbf+m\bw.
 \end{gather}
 It can be validated by solving \eqsref{eq:single_conv_ode} with the assist of the integrating factor $\exp\left(st\right)$.
 \subsection{An Efficient Algorithm}
@@ -44,7 +44,7 @@ Instead of directly integrating \eqsref{eq:single_conv} using higher-order metho
 
 Given that popular time integration methods are of second order accuracy, in the context of a discretised iterative solving schema, \eqsref{eq:single_conv_ode} can be rewritten as follows using the trapezoidal rule, which is second order accurate,
 \begin{gather}
-\bbf_{n+1}=\bbf_n+\dfrac{\Delta{}t}{2}\left(\bbf_n'+\bbf_{n+1}'\right).
+\bbf_{n+1}=\bbf_n+\dfrac{\Delta{}t}{2}\left(\dot{\bbf}_n+\dot{\bbf}_{n+1}\right).
 \end{gather}
 Expanding and rearranging lead to
 \begin{gather}\label{eq:discretised_c}
