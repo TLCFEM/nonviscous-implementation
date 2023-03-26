@@ -24,6 +24,7 @@ The viscous damping matrix $\mb{C}$ may not be trivial as the system may consist
 \end{gather}
 is the combination of the three, its specific form depends on the specific time integration method used.
 \section{Nonviscous Damping With A Single Exponential Kernel}
+The present section introduces an enhancement of the algorithm proposed by \citet{Adhikari2004} through optimisation. The improvement is accomplished by reformulating the algorithm into a form that enables the integration of arbitrary kernel functions.
 \subsection{A Single Exponential Kernel}
 We start with the scalar-valued exponential kernel function
 \begin{gather}
@@ -89,6 +90,8 @@ The local iteration body is summarised in \algoref{algo:single_model}.
 \end{breakablealgorithm}
 The steps with a leading \faMicrochip~symbol augment global effective stiffness and resistance to obtain $\bhat{K}$ and $\bhat{y}$. Those are additional steps that need to be computed compared to a conventional algorithm for nonviscously damped systems. Once convergence is achieved, it is necessary to store the history of nonviscous damping force $\bbf_n\leftarrow\bbf$.
 
+Upon careful comparison, it becomes evident that the algorithm presented in this study bears resemblance to the one discussed by \citet{Adhikari2004}. However, there are significant differences between them. Specifically, \algoref{algo:single_model} tracks the history of non-viscous damping force, and it does not differentiate between full-rank and rank-deficient cases. As a result, it eliminates the need for any supplementary matrix factorisations.
+
 Unlike other algorithms, such as the one by \citet{Cortes2009}, \algoref{algo:single_model} does not impose additional requirements to the time integration method used.
 \subsection{Complexity Analysis}
 The term $\mb{T}\ddfrac{\bv}{\bu}\delta\bu$ can be efficiently computed by masking $\delta\bu$ as $\mb{T}$ is a diagonal matrix while $\ddfrac{\bv}{\bu}$ can be equivalently converted into a scalar (see discussion before). Assuming the system has a size of $n$, it requires at most $n$ floating point number arithmetic. All three extra steps require pure vector operations, the total number of floating point number multiplications is $4n$, that is a time complexity of $\mathcal{O}\left(n\right)$.
@@ -102,7 +105,7 @@ g=\sum_{l=1}^{j}g_l\left(t\right)=\sum_{l=1}^{j}m_l\exp\left(-s_lt\right),
 \end{gather}
 where $m_l$ and $s_l$ can be complex numbers, then
 \begin{gather}\label{eq:sum_conv}
-\bbf\left(t\right)=g*\bw=\sum_{l=1}^{j}g_l\left(t\right)*\bw=\sum_{l=1}^{j}\bbf_l.
+\bbf\left(t\right)=g*\bw=\sum_{l=1}^{j}g_l*\bw=\sum_{l=1}^{j}\bbf_l.
 \end{gather}
 For each of $\bbf_l$, \eqsref{eq:discretised_c} also holds and only involves $\bbf_l$ itself and the common quantity $\bw$. Thus,
 \begin{gather}
