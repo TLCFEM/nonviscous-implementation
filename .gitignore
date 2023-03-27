@@ -27,3 +27,7 @@
 NON.pdf
 venv
 .idea
+.vscode
+*.fls
+*.fdb_latexmk
+*.bib.sav
