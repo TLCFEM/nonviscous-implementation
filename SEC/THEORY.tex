@@ -40,7 +40,7 @@ The convolution can be then expressed as
 \dot{\bbf}=-s\bbf+m\bw.
 \end{gather}
 It can be validated by solving \eqsref{eq:single_conv_ode} with the assistance of the integrating factor $\exp\left(st\right)$.
-\subsection{An Efficient Algorithm}
+\subsection{An Efficient Direct Time Integration Algorithm}
 Instead of directly integrating \eqsref{eq:single_conv} using higher-order methods (such as the Runge--Kutta family), \eqsref{eq:single_conv_ode} can be combined with \eqsref{eq:eom} to develop an efficient algorithm.
 
 Given that popular time integration methods are of second-order accuracy, in the context of a discretised iterative solving schema, \eqsref{eq:single_conv_ode} can be rewritten as follows using the trapezoidal rule, which is second-order accurate,
@@ -53,13 +53,11 @@ Expanding and rearranging lead to
 \end{gather}
 in which subscripts $\left(\cdot\right)_{n+1}$ and $\left(\cdot\right)_n$ denote the corresponding quantity at $t_n$ and $t_{n+1}=t_n+\Delta{}t$.
 
-It must be pointed out that the idea to introduce an internal variable is similar to the approach presented by \citet[][see \S~4.3]{Adhikari2014}. In this work, instead of the filtered velocity \citep[][see Eq. 4.23]{Adhikari2014}, the nonviscous damping force is chosen as the internal variable, which, as can be seen later, eventually leads to a system that can be effectively solved.
-
 Assuming \eqsref{eq:eom} is satisfied at $t_{n+1}$, then, accounting for \eqsref{eq:discretised_c}, \eqsref{eq:eom} (with the subscript $\left(\cdot\right)_{n+1}$ dropped for brevity) is
 \begin{gather}\label{eq:residual}
 \mb{y}+\dfrac{2-s\Delta{}t}{2+s\Delta{}t}\bbf_n+\dfrac{m\Delta{}t}{2+s\Delta{}t}\bw_n+\dfrac{m\Delta{}t}{2+s\Delta{}t}\bw=\mb{p}.
 \end{gather}
-Note that this assumption is not always valid as some time integration methods establish the EOM elsewhere, see, for example, the generalised-$\alpha$ method \citep{Chung1993}, the GSSSS method \citep{Zhou2003}, the Bathe two-step method \citep{Noh2019}, the OALTS method \citep{Zhang2021}, etc.
+Note that this assumption is not always valid as some time integration methods establish the EOM elsewhere, see, for example, the generalised-$\alpha$ method \citep{Chung1993}, the GSSSS method \citep{Zhou2003}, the Bathe two-step method \citep{Noh2019}, the OALTS method \citep{Zhang2021}, etc. In those cases, \eqsref{eq:residual} needs to be modified accordingly.
 Differentiation leads to the following revised effective stiffness $\bhat{K}$,
 \begin{gather}\label{eq:revised_k}
 \bhat{K}=\bbar{K}+\dfrac{m\Delta{}t}{2+s\Delta{}t}\mb{T}\ddfrac{\bv}{\bu}.
@@ -91,9 +89,9 @@ The local iteration body is summarised in \algoref{algo:single_model}.
 \end{breakablealgorithm}
 The steps with a leading \faMicrochip~symbol augment global effective stiffness and resistance to obtain $\bhat{K}$ and $\bhat{y}$. Those are additional steps that need to be computed compared to a conventional algorithm for nonviscously damped systems. Once convergence is achieved, it is necessary to store the history of nonviscous damping force $\bbf_n\leftarrow\bbf$.
 
-Upon careful comparison, it becomes evident that the algorithm presented in this study bears resemblance to the one discussed by \citet{Adhikari2004}. However, there are significant differences between them. Specifically, \algoref{algo:single_model} tracks the history of non-viscous damping force, and it does not differentiate between full-rank and rank-deficient cases. As a result, it eliminates the need for any supplementary matrix factorisations.
+Upon careful comparison, it becomes evident that the algorithm presented in this study bears resemblance to the one discussed by \citet{Adhikari2004}. However, there are significant differences between them. Specifically, \algoref{algo:single_model} tracks the history of non-viscous damping force, and it does not differentiate between full-rank and rank-deficient cases. As a result, it eliminates the need for any supplementary matrix factorisations. \algoref{algo:single_model} directly discretises the EOM without converting it to a first-order system.
 
-Unlike other algorithms, such as the one by \citet{Cortes2009}, \algoref{algo:single_model} does not impose additional requirements on the time integration method used.
+Unlike other algorithms, such as the one by \citet{Cortes2009}, \algoref{algo:single_model} does not impose additional requirements on the time integration method used. Some existing state-space methods manage to eliminate the convolution integral term from the \textbf{continuous} version of \eqsref{eq:eom} \citep[see][]{Wagner2003,Wu2019}, which, in the writers' opinion, overcomplicates the solution procedure in the context of numerical analysis, given that the analytical first-order ODE in the state space would still need to be discretised \citep{Adhikari2004} and numerically integrated for general systems. Nonetheless, whenever analytical solutions are sought, those methods provide extra merits that direct time integration methods do not offer, at the cost of increasing computational cost drastically.
 \subsection{Complexity Analysis}
 The term $\mb{T}\ddfrac{\bv}{\bu}\delta\bu$ can be efficiently computed by masking $\delta\bu$ as $\mb{T}$ is a diagonal matrix while $\ddfrac{\bv}{\bu}$ can be equivalently converted into a scalar (see discussion before). Assuming the system has a size of $n$, it requires at most $n$ floating point number arithmetic. All three extra steps require pure vector operations, the total number of floating point number multiplications is $4n$, that is a time complexity of $\mathcal{O}\left(n\right)$.
 
@@ -145,7 +143,7 @@ in its explicit form
 \bbf=\sum_{k=1}^{i}\sum_{l=1}^{j^k}\bbf_l^k=\sum_{k=1}^{i}\sum_{l=1}^{j^k}g_l^k\left(t\right)\bw^k=\sum_{k=1}^{i}\sum_{l=1}^{j^k}m_l^k\exp\left(-s_l^kt\right)\bw^k.
 \end{gather}
 
-Since additivity still holds, there is no essential difference between \eqsref{eq:sum_exp} and \eqsref{eq:composition}. $m_l^k$ and $s_l^k$ are parameters for $l$-th component of $k$-th kernel. $\bw^k=\mb{T}^k\bv$ can be obtained by either node-based or element-based rules. For the former, it is assumed different regions (characterised by nodes) possess different damping responses. For the latter, it is assumed different elements possess different damping responses, similar to a typical assembly process. No matter how $\bw^k$ is constructed, the revised stiffness and resistance for each $\bbf_l^k$ only require vector--scalar operation.
+Since additivity still holds, there is no essential difference between \eqsref{eq:sum_exp} and \eqsref{eq:composition}, in which $m_l^k$ and $s_l^k$ are the parameters for the $l$-th component of the $k$-th kernel, $\bw^k=\mb{T}^k\bv$ can be obtained by either node-based or element-based rules. For the former, it is assumed different regions (characterised by nodes) possess different damping responses. For the latter, it is assumed different elements possess different damping responses, similar to a typical assembly process, example applications can be seen elsewhere \citep{Friswell2007}. No matter how $\bw^k$ is constructed, the revised stiffness and resistance for each $\bbf_l^k$ only require vector--scalar operations (while $\bw^k$ itself may be computed based on $\bv$ via matrix--vector operations).
 
 Denoting
 \begin{gather}
