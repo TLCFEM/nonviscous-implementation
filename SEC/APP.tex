@@ -1,0 +1,49 @@
+\appendix
+\section{Closed Form Solution}
+Performing Laplace transform of the following homogeneous ODE
+\begin{gather}\label{eq:single_exp}
+m\ddot{u}\left(t\right)+\int_0^tc\mu\exp\left(-\mu\left(t-\tau\right)\right)\dot{u}\left(\tau\right)\md{\tau}+ku\left(t\right)=0
+\end{gather}
+yields
+\begin{gather}
+m\left(s^2U-su_0-\dot{u}_0\right)
++c\mu\dfrac{sU-u_0}{s+\mu}
++kU
+=0,
+\end{gather}
+where $U=U\left(s\right)$. Rearranging gives
+\begin{gather}
+\left(
+s^3
++\mu{}s^2
++\dfrac{c\mu+k}{m}s
++\dfrac{k\mu}{m}\right)U
+=
+u_0s^2
++\left(u_0\mu+\dot{u}_0\right)s
++\mu\dot{u}_0
++\dfrac{c\mu{}}{m}u_0.
+\end{gather}
+Assuming the three roots of the characteristic equation are $r_1$, $r_2$ and $r_3$, and $U$ can be expressed as
+\begin{gather}
+U\left(s\right)=\sum_{i=1}^3\dfrac{P_i}{s-r_i},
+\end{gather}
+expanding and comparing,
+\begin{gather}
+\begin{bmatrix}
+1&1&1\\
+-r_2-r_3&-r_1-r_3&-r_1-r_2\\
+r_2r_3&r_1r_3&r_1r_2
+\end{bmatrix}
+\begin{bmatrix}
+P_1\\P_2\\P_3
+\end{bmatrix}
+=
+\begin{bmatrix}
+u_0\\u_0\mu+\dot{u}_0\\\dfrac{c\mu{}}{m}u_0
+\end{bmatrix}.
+\end{gather}
+After solving $P_i$, transforming $U$ back to the time domain gives the solution
+\begin{gather}
+u(t)=\sum_{i=1}^3P_i\exp\left(r_1t\right).
+\end{gather}
