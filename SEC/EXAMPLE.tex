@@ -1,4 +1,22 @@
 \section{Numerical Examples}
+\subsection{SDOF System With Single Exponential}
+We start with the validation of \algoref{algo:single_model}. To this end, consider the free vibration of a SDOF system with one exponential kernel such that the EOM can be expressed as
+\begin{gather}
+m\ddot{u}\left(t\right)+\int_0^tc\mu\exp\left(-\mu\left(t-\tau\right)\right)\dot{u}\left(\tau\right)\md{\tau}+ku\left(t\right)=0.
+\end{gather}
+The parameters are set to $m=1$, $c=2$, $\mu=1$, $k=100$.
+The initial conditions are $u\left(0\right)=1$, $\dot{u}\left(0\right)=1$ and $\ddot{u}\left(0\right)=1$.
+The closed form solution can be found in \secref{sec:analytical_sdof}.
+The Newmark (constant acceleration) method is used for time integration.
+The displacement history and the corresponding error convergence are shown in \figref{fig:sdof}.
+
+The maximum of the difference between numerical and analytical solutions is taken as the absolute error $\epsilon$. It is evident that \eqsref{eq:discretised_c} retains the second-order accuracy of the Newmark method.
+\begin{figure}[H]
+\centering
+\includegraphics{PY/single_exp}
+\caption{displacement history and error analysis of SDOF oscillator with one exponential kernel}\label{fig:sdof}
+\end{figure}
+\subsection{Three DOF System}
 \begin{figure}[H]
 \centering
 \begin{tikzpicture}
