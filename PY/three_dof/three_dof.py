@@ -1,10 +1,7 @@
-import dataclasses
-
 import h5py
 import matplotlib
 import numpy as np
 from matplotlib import pyplot as plt
-from numpy import exp
 from scipy.stats import linregress
 
 from PY.Utility import LS, Response
@@ -177,22 +174,13 @@ def three_dof():
         error_y2.append(np.mean(np.abs(value[1].error)))
         error_y3.append(np.mean(np.abs(value[2].error)))
 
-    result = linregress(np.log(error_x), np.log(error_y1))
-    plt.loglog(error_x, np.exp(result[1]) * np.power(error_x, result[0]),
-               label=f'$x_1$ slope {result[0]:.3f} $r^2=${result[2] ** 2:.3f}')
-    plt.loglog(error_x, error_y1, 'o')
+    for data, key in zip([error_y1, error_y2, error_y3], ['$x_1$', '$x_2$', '$x_3$']):
+        result = linregress(np.log(error_x), np.log(data))
+        plt.loglog(error_x, np.exp(result[1]) * np.power(error_x, result[0]),
+                   label=f'{key} slope {result[0]:.3f} $r^2=${result[2] ** 2:.3f}')
+        plt.loglog(error_x, data, 'o')
 
-    result = linregress(np.log(error_x), np.log(error_y2))
-    plt.loglog(error_x, np.exp(result[1]) * np.power(error_x, result[0]),
-               label=f'$x_2$ slope {result[0]:.3f} $r^2=${result[2] ** 2:.3f}')
-    plt.loglog(error_x, error_y2, 'o')
-
-    result = linregress(np.log(error_x), np.log(error_y3))
-    plt.loglog(error_x, np.exp(result[1]) * np.power(error_x, result[0]),
-               label=f'$x_3$ slope {result[0]:.3f} $r^2=${result[2] ** 2:.3f}')
-    plt.loglog(error_x, error_y3, 'o')
-
-    plt.grid(True, which='both', linestyle='--', linewidth=.2)
+    plt.grid(which='both', linestyle='--', linewidth=.2)
     plt.legend()
     plt.xlabel(r'$\Delta{}t$ (s)')
     plt.ylabel('absolute error $\\epsilon$')

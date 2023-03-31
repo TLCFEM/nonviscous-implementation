@@ -12,15 +12,17 @@ jobs:
       - run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          cd PY
+          export PYTHONPATH=$PWD
+          cd PY/single_dof
           python single_exp.py
+          cd ../three_dof
           python three_dof.py
-          cd ..
+          cd ../..
       - name: Compile
         uses: xu-cheng/texlive-action/full@v1
         with:
           run: |
-            latexmk -pdf DYNDSP.tex
+            latexmk -pdf NON.tex
       - name: Release
         uses: svenstaro/upload-release-action@v2
         with:

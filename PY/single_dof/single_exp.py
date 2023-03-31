@@ -87,7 +87,7 @@ if __name__ == '__main__':
     plt.legend(loc='lower right', ncol=2)
     plt.xlabel('time (s)')
     plt.ylabel('displacement')
-    plt.grid(True)
+    plt.grid(which='both', linestyle='--', linewidth=.2)
     plt.xlim(0, 10)
 
     fig.add_subplot(2, 1, 2)
@@ -104,7 +104,7 @@ if __name__ == '__main__':
     plt.loglog(error_x, np.exp(result[1]) * np.power(error_x, result[0]), 'r--',
                label=f'slope {result[0]:.3f} $r^2=${result[2] ** 2:.3f}')
     plt.loglog(error_x, error_y, 'o')
-    plt.grid(True, which='both', linewidth=.5)
+    plt.grid(which='both', linestyle='--', linewidth=.2)
     plt.legend()
     plt.xlabel(r'$\Delta{}t$ (s)')
     plt.ylabel('absolute error $\\epsilon$')

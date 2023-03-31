@@ -1,4 +1,5 @@
 \section{Numerical Examples}
+In the following examples, units are omitted for brevity.
 \subsection{SDOF System With Single Exponential}
 We start with the validation of \algoref{algo:single_model}. To this end, consider the free vibration of a SDOF system with one exponential kernel such that the EOM can be expressed as
 \begin{gather}
@@ -16,7 +17,8 @@ The maximum of the difference between numerical and analytical solutions is take
 \includegraphics{PY/single_exp}
 \caption{displacement history and error analysis of SDOF oscillator with one exponential kernel}\label{fig:sdof}
 \end{figure}
-\subsection{Three DOF System}
+\subsection{Three DOF System With Two Exponentials}
+A three-degree-of-freedom system shown in \figref{fig:three_dof} is adopted to demonstrate the applicability of the proposed algorithm in MDOF systems. This example is also adopted by some of aforementioned work \cite[see, e.g.,][]{Adhikari2004,Cortes2009,Shen2019,Liu2023}.
 \begin{figure}[H]
 \centering
 \begin{tikzpicture}
@@ -38,16 +40,35 @@ The maximum of the difference between numerical and analytical solutions is take
 \draw[|->](2.75,1.25)--++(.5,0)node[above]{$x_1$};
 \draw[|->](5.75,1.25)--++(.5,0)node[above]{$x_2$};
 \draw[|->](8.75,1.25)--++(.5,0)node[above]{$x_3$};
+\node at(2.75,.5){$m$};
+\node at(5.75,.5){$m$};
+\node at(8.75,.5){$m$};
+\node at(1.25,1.25){$k$};
+\node at(4.25,1.25){$k$};
+\node at(7.25,1.25){$k$};
+\node at(10.25,1.25){$k$};
+\node at(1.25,-.5){$g_1$};
+\node at(4.75,-1.25){$g_1$};
+\node at(7.25,-.5){$g_2$};
 \end{tikzpicture}
+\caption{three DOF system with two exponential kernels}\label{fig:three_dof}
 \end{figure}
+The parameters are set to $m=3$, $k=2$ and
+\begin{gather}
+g_1=\num{0.6}\exp\left(-t\right),\qquad
+g_2=\exp\left(-\num{5}t\right).
+\end{gather}
+The initial conditions are $x_1\left(0\right)=1$, $x_2\left(0\right)=x_3\left(0\right)=0$, and $\dot{x}_1\left(0\right)=\dot{x}_2\left(0\right)=\dot{x}_3\left(0\right)=0$. One can compute the initial acceleration using the analytical solution such that $\ddot{x}_1\left(0\right)=-4/3$, $\ddot{x}_2\left(0\right)=2/3$ and $\ddot{x}_3\left(0\right)=0$.
+The analytical solution can be obtained via modal analysis/expansion, the relevant derivations can be seen elsewhere \citep[see][\S~4.6.2]{Adhikari2014}.
+The Newmark (constant acceleration) method is used for time integration.
 
+The displacement histories of three DoFs are depicted in \figref{fig:three}.
 \begin{figure}[H]
 \centering
 \includegraphics{PY/three_dof}
 \caption{displacement history and error analysis of three DOF system with two exponential kernels}\label{fig:three}
 \end{figure}
 
-The analytical solution is obtained via modal analysis/expansion, the relevant derivations can be seen elsewhere \citep[see][\S~4.6.2]{Adhikari2014}.
 
 Compared to the numerical solutions (with $\Delta{}t=\SI{0.05}{\second}$) obtained by \citet{Cortes2009}, the present algorithm yields more accurate results. Even for a large time step $\Delta{}t=\SI{0.1}{\second}$, unlike other methods \citep{Liu2023}, there is no severe deviation observed.
 
