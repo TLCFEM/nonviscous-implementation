@@ -30,10 +30,25 @@ The maximum of the difference between numerical and analytical solutions is take
 \Spring{9.5,.75}{11,.75}{1.5}
 \Dashpot{6.5,.25}{8,.25}{1.5}
 \Dashpot{.5,.25}{2,.25}{1.5}
+\Dashpot{4,-.5}{5.5,-.5}{1.5}
 \FixedSupport[-90]{.5,.5}{2}
 \FixedSupport[90]{11,.5}{2}
+\FixedSupport[-90]{4,-.5}
+\draw[line width=.4mm](5.5,-.5)--++(0,.5);
 \draw[|->](2.75,1.25)--++(.5,0)node[above]{$x_1$};
 \draw[|->](5.75,1.25)--++(.5,0)node[above]{$x_2$};
 \draw[|->](8.75,1.25)--++(.5,0)node[above]{$x_3$};
 \end{tikzpicture}
 \end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics{PY/three_dof}
+\caption{displacement history and error analysis of three DOF system with two exponential kernels}\label{fig:three}
+\end{figure}
+
+The analytical solution is obtained via modal analysis/expansion, the relevant derivations can be seen elsewhere \citep[see][\S~4.6.2]{Adhikari2014}.
+
+Compared to the numerical solutions (with $\Delta{}t=\SI{0.05}{\second}$) obtained by \citet{Cortes2009}, the present algorithm yields more accurate results. Even for a large time step $\Delta{}t=\SI{0.1}{\second}$, unlike other methods \citep{Liu2023}, there is no severe deviation observed.
+
+The convergence of absolute error again shows a quadratic order, implying the simple \eqsref{eq:eqv_sys} is effective.

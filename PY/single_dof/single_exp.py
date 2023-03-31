@@ -6,19 +6,12 @@ import numpy as np
 from matplotlib import pyplot as plt
 from numpy import exp
 
-from PY.Utility import LS
+from PY.Utility import LS, Response
 
 u0 = 1
 v0 = 0
 
 matplotlib.rcParams.update({'font.size': 6})
-
-
-@dataclasses.dataclass
-class Response:
-    time: np.ndarray
-    displacement: np.ndarray
-    error: np.ndarray
 
 
 def system(m, c, k, nu):
@@ -118,4 +111,4 @@ if __name__ == '__main__':
 
     fig.tight_layout(pad=.1)
     plt.show()
-    fig.savefig('single_exp.pdf')
+    fig.savefig('../single_exp.pdf')

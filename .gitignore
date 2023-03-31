@@ -31,3 +31,4 @@ venv
 *.fls
 *.fdb_latexmk
 *.bib.sav
+__pycache__

@@ -1,4 +1,7 @@
+import dataclasses
 from itertools import cycle
+
+import numpy as np
 
 
 def get_line_style():
@@ -26,3 +29,10 @@ def get_line_style():
 
 
 LS = get_line_style()
+
+
+@dataclasses.dataclass
+class Response:
+    time: np.ndarray
+    displacement: np.ndarray
+    error: np.ndarray
