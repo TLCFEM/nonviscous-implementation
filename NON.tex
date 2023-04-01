@@ -41,22 +41,10 @@
 \newcommand{\ba}{\mb{a}}
 \newcommand{\bx}{\mb{x}}
 \newcommand{\bbf}{\mb{f}}
-\def\thefootnote{\fnsymbol{footnote}}
 \DeclarePairedDelimiter\abs{\lvert}{\rvert}
 \DeclarePairedDelimiter\norm{\lVert}{\rVert}
-\tcbset{
-    sharp corners,
-    colback = white,
-    before skip = 0.2cm,    % add extra space before the box
-    after skip = 0.5cm      % add extra space after the box
-}                           % setting global options for tcolorbox
-\newtcolorbox{Objective}{
-    sharpish corners, % better drop shadow
-    boxrule = 0pt,
-    leftrule = 4.5pt, % top rule weight
-    enhanced,
-    fuzzy shadow = {0pt}{-2pt}{-0.5pt}{0.5pt}{black!35} % {xshift}{yshift}{offset}{step}{options}
-}
+\tcbset{sharp corners,colback = white,before skip = 0.2cm,after skip = 0.5cm}
+\newtcolorbox{Objective}{sharpish corners,boxrule = 0pt,leftrule = 4.5pt,enhanced,fuzzy shadow = {0pt}{-2pt}{-0.5pt}{0.5pt}{black!35}}
 \makeatletter
 \let\oldabs\abs
 \def\abs{\@ifstar{\oldabs}{\oldabs*}}

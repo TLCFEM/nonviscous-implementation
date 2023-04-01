@@ -32,3 +32,4 @@ venv
 *.fdb_latexmk
 *.bib.sav
 __pycache__
+PY/*.pdf
