@@ -17,6 +17,7 @@ jobs:
           python single_exp.py
           cd ../three_dof
           python three_dof.py
+          python kernel.py
           cd ../..
       - name: Compile
         uses: xu-cheng/texlive-action/full@v1
