@@ -107,9 +107,32 @@ def split(r: str):
     return np.array(m_complex), np.array(s_complex)
 
 
+def print_table(m, s):
+    print(r'\begin{tabular}{r|r|r|r}')
+    print(r'\toprule')
+    print(r'$\Re(m)$ & $\Im(m)$ & $\Re(s)$ & $\Im(s)$ \\')
+    print(r'\midrule')
+
+    for i, j in zip(m, s):
+        print(f'\\num{{{i.real:.15e}}}&\\num{{{i.imag:.15e}}}&', end='')
+        print(f'\\num{{{j.real:.15e}}}&\\num{{{j.imag:.15e}}}\\\\')
+
+    print(r'\bottomrule')
+    print(r'\end{tabular}')
+
+    print('================================================================================================')
+
+    for i, j in zip(m, s):
+        print(f'{i.real: .15e} {i.imag: .15e} {j.real: .15e} {j.imag: .15e} \\')
+
+    print('================================================================================================')
+
+
 def plotter(output: str, k):
     if (result := split(output)) is None:
         return
+
+    print_table(*result)
 
     x = np.linspace(0, 5, 501)
     yy = k(x)
@@ -126,23 +149,23 @@ if __name__ == '__main__':
 
     axs[0].plot(x, ref, 'b-', label='kernel $g_1$', linewidth=2)
     axs[0].plot(x, y.real, 'r', linestyle='dashdot', label='approximation', linewidth=3)
-    axs[0].legend()
+    axs[0].legend(handlelength=6)
 
     ax2 = axs[0].twinx()
     ax2.plot(x, np.abs(ref - y), 'g--', label='absolute error', linewidth=1)
     ax2.set_yscale('log')
-    ax2.legend(loc='center right')
+    ax2.legend(loc='center right', handlelength=6)
 
     x, y, ref = plotter(kernel2, kernel2_ana)
 
     axs[1].plot(x, ref, 'b-', label='kernel $g_2$', linewidth=2)
     axs[1].plot(x, y.real, 'r', linestyle='dashdot', label='approximation', linewidth=3)
-    axs[1].legend()
+    axs[1].legend(handlelength=6)
 
     ax4 = axs[1].twinx()
     ax4.plot(x, np.abs(ref - y), 'g--', label='absolute error', linewidth=1)
     ax4.set_yscale('log')
-    ax4.legend(loc='center right')
+    ax4.legend(loc='center right', handlelength=6)
 
     ax4.set_ylim(1e-15, 1e-12)
     ax2.sharey(ax4)

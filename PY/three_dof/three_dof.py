@@ -116,16 +116,17 @@ def numerical(vibrator, pick):
             Response(time, displacement3, ref3 - displacement3))
 
 
-def add_plot(ax, results, pick):
+def add_plot(ax, results, pick, lw=None):
     response = results[pick]
+    line_width = lw or 2
     ax.plot(
-        response[0].time, response[0].displacement, label=f'$x_1$ ($\\Delta{{}}t={pick}$)', linewidth=2,
+        response[0].time, response[0].displacement, label=f'$x_1$ ($\\Delta{{}}t={pick}$)', linewidth=line_width,
         linestyle=next(LS))
     ax.plot(
-        response[1].time, response[1].displacement, label=f'$x_2$ ($\\Delta{{}}t={pick}$)', linewidth=2,
+        response[1].time, response[1].displacement, label=f'$x_2$ ($\\Delta{{}}t={pick}$)', linewidth=line_width,
         linestyle=next(LS))
     ax.plot(
-        response[2].time, response[2].displacement, label=f'$x_3$ ($\\Delta{{}}t={pick}$)', linewidth=2,
+        response[2].time, response[2].displacement, label=f'$x_3$ ($\\Delta{{}}t={pick}$)', linewidth=line_width,
         linestyle=next(LS))
 
 
@@ -152,10 +153,10 @@ def three_dof():
     ax1.plot(x, y3, label='$x_3$ analytical', linewidth=1)
     next(LS)
 
-    add_plot(ax1, results, '0.1')
-    add_plot(ax1, results, '0.05')
+    add_plot(ax1, results, '0.1', 1.4)
+    add_plot(ax1, results, '0.05', 1.4)
 
-    ax1.legend(ncol=3, loc='upper right')
+    ax1.legend(ncol=3, loc='upper right', handlelength=4)
 
     plt.xlabel('time (s)')
     plt.ylabel('displacement')

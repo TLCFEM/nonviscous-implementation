@@ -69,92 +69,28 @@ The displacement histories of three DoFs are depicted in \figref{fig:three}.
 \caption{displacement history and error analysis of three DOF system with two exponential kernels}\label{fig:three}
 \end{figure}
 
-
 Compared to the numerical solutions (with $\Delta{}t=\SI{0.05}{\second}$) obtained by \citet{Cortes2009}, the present algorithm yields more accurate results. Even for a large time step $\Delta{}t=\SI{0.1}{\second}$, unlike other methods \citep{Liu2023}, there is no severe deviation observed.
 
 The convergence of absolute error again shows a quadratic order, implying the simple \eqsref{eq:eqv_sys} is effective.
 
-
+\subsection{Three DOF System With Two Gaussian Kernels}
+In the previous example, instead of two exponential kernels, two Gaussian kernels
+\begin{gather}
+g_1=1.2\sqrt{\dfrac{1}{\pi}}\exp\left(-t^2\right),\\
+g_2=0.4\sqrt{\dfrac{5}{\pi}}\exp\left(-5t^2\right),
+\end{gather}
+can be used. The sum-of-exponential approximations given by the VPMR algorithm are shown in \figref{fig:vpmr}. With a tolerance around \num{e-12}, only \num{13} exponentials are required. The corresponding $m_l$ and $s_l$ parameters are given in \secref{sec:vpmr}.
 \begin{figure}[H]
 \centering
 \includegraphics{PY/kernel}
 \caption{approximations of Gaussian kernels using VPMR algorithm}\label{fig:vpmr}
 \end{figure}
 
-Using the following parameters:
-        nc = 4.
-         n = 40.
-     order = 800.
- precision = 684.
- tolerance = 1.0000e-12.
-%    kernel = 1.2*sqrt(1/pi)*exp(-t^2).
+\begin{figure}[H]
+\centering
+\includegraphics{PY/three_gauss}
+\caption{displacement history of three DOF system with two Gaussian kernels}\label{fig:three_gauss}
+\end{figure}
+For $\Delta{}t\approx\num{e-3}$, quadratic convergence implies the error is around \num{e-6}. In such a condition, the tolerance \num{e-12} used for kernel approximation is considered accurate. In practice, one can determine the tolerance based on the time step size, which can be chosen based on the properties of the dynamic system of interest, such that a proper number of exponentials would be used to balance between accuracy and efficiency. \figref{fig:three_gauss} compares the results with different time step sizes. Numerical results obtained by using other methods can be seen elsewhere \citep{Shen2021}.
 
-M =
-+3.1408564644840428e+01+2.4419195061753636e-204j
--1.6706983140997441e+01+1.6944936341891648e+01j
--1.6706983140997441e+01-1.6944936341891648e+01j
-+4.3117593746835351e-03+1.0182620511730521e+01j
-+4.3117593746835351e-03-1.0182620511730521e+01j
-+1.5801217025257626e+00+1.7151347706207849e+00j
-+1.5801217025257626e+00-1.7151347706207849e+00j
--2.5283515424182218e-01+3.6580452129545922e-02j
--2.5283515424182218e-01-3.6580452129545922e-02j
-+9.6864499480377557e-03+4.3130572825140741e-03j
-+9.6864499480377557e-03-4.3130572825140741e-03j
--7.0188900179621449e-05+5.9181046455302063e-05j
--7.0188900179621449e-05-5.9181046455302063e-05j
-S =
-+4.5016919366209596e+00-0.0000000000000000e+00j
-+4.4950837272609609e+00+1.0395441820843294e+00j
-+4.4950837272609609e+00-1.0395441820843294e+00j
-+4.4749101704334056e+00-2.0949342266104529e+00j
-+4.4749101704334056e+00+2.0949342266104529e+00j
-+4.4400143885590264e+00+3.1851640805978376e+00j
-+4.4400143885590264e+00-3.1851640805978376e+00j
-+4.3879941466299011e+00-4.3376514748574726e+00j
-+4.3879941466299011e+00+4.3376514748574726e+00j
-+4.3138681929799541e+00-5.6015344176775130e+00j
-+4.3138681929799541e+00+5.6015344176775130e+00j
-+4.2046027378649198e+00+7.1006004448588689e+00j
-+4.2046027378649198e+00-7.1006004448588689e+00j
-
-
-Using the following parameters:
-        nc = 4.
-         n = 60.
-     order = 800.
- precision = 1044.
- tolerance = 1.0000e-13.
-%    kernel = .4*sqrt(5/pi)*exp(-5*t^2).
-
-M =
-+2.3906159000727541e+01+1.3867518867778434e-312j
--1.2762256426897499e+01+1.2860476490373076e+01j
--1.2762256426897499e+01-1.2860476490373076e+01j
-+5.3218297629940091e-02+7.7608889955930351e+00j
-+5.3218297629940091e-02-7.7608889955930351e+00j
-+1.1940946465978099e+00+1.3211005737652248e+00j
-+1.1940946465978099e+00-1.3211005737652248e+00j
--1.9326268560869156e-01+3.0383779818506866e-02j
--1.9326268560869156e-01-3.0383779818506866e-02j
-+7.4948577453368154e-03+3.2098505412941876e-03j
-+7.4948577453368154e-03-3.2098505412941876e-03j
--5.4937628189936578e-05+4.4960570107889509e-05j
--5.4937628189936578e-05-4.4960570107889509e-05j
-S =
-+1.0087637748351039e+01-0.0000000000000000e+00j
-+1.0072828830375100e+01+2.3227012589928293e+00j
-+1.0072828830375100e+01-2.3227012589928293e+00j
-+1.0027597533472361e+01-4.6807376205102571e+00j
-+1.0027597533472361e+01+4.6807376205102571e+00j
-+9.9492752852218480e+00+7.1164847349390277e+00j
-+9.9492752852218480e+00-7.1164847349390277e+00j
-+9.8323245672882003e+00-9.6911681681668096e+00j
-+9.8323245672882003e+00+9.6911681681668096e+00j
-+9.6653057328147884e+00-1.2514633249962301e+01j
-+9.6653057328147884e+00+1.2514633249962301e+01j
-+9.4185072574984083e+00+1.5863782488080192e+01j
-+9.4185072574984083e+00-1.5863782488080192e+01j
-
-
-
+For this particular example with a few DoFs\footnote{The exact number may not be \num{3}, as it depends on how the system is modelled.} and elements, the extra time required by nonviscous damping (\num{13} exponentials) is around \SI{15}{\percent} of total analysis time. Noting that the approximation of kernel is computed offline and does not change with the size of dynamic system, it can be extrapolated that for large systems, the cost of computing \eqsref{eq:composition} is not subtle.

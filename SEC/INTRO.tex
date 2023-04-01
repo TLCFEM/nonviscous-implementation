@@ -21,6 +21,23 @@ Such a direct approach is intuitive, general--purpose such that it can be used f
 
 However, no matter how the convolution term is integrated, it has to been performed for \textbf{each} substep. Given the nature of convolution, most intermediate results computed in the current substep cannot be reused in subsequent substeps. The potential exception is the values of $g(T-t_i)$ evaluated at $t_i$, which do not need to be re-evaluated if $T$ and $t_i$ satisfy certain conditions. Existing methods typically use the same set of $t_i$ in both response history analysis (to define time substeps) and numerical integration of \eqsref{eq:conv} (as the abscissae), this gives a complexity of $\mathcal{O}\left(n^2\right)$ where $n$ denotes the number of substeps. The explicit integration also requires additional kinetic assumptions, that may conflict against the ones adopted by the corresponding time integration method, to be imposed. They have significant impacts on the final analysis result \citep[see][]{Liu2014} and may even lead to poor result \cite[see][Figs. 12, 17, 25, 26]{Liu2023}.
 \subsection{State Space Methods}
-The state space methods essentially convert the second-order ODE into a first-order one, with which analytical methods such as modal analysis can be applied to obtain analytical solutions for linear systems. Such a conversion can be done directly in the time domain or via Laplace transform, depending on the number and form of the specific kernel function(s). By introducing additional state variables, the convolution integral can be eliminated at the cost of increasing the order of time derivatives \citep[see, e.g.,][]{Wu2019}.
+With the assist of Laplace transform, the convolution term involving (sum of) exponential kernels (and potentially other functions) can be eliminated at the cost of increasing the order of time derivatives \citep[see, e.g.,][]{Wu2019}. By further introducing additional state variables, the second-order system \eqsref{eq:single_eom} can be converted into a first-order one, with which methods such as modal analysis\footnote{Noting that polynomial eigenvalue problems are essentially equivalent to generalised eigenvalue problems.} can be applied to obtain analytical solutions for linear systems.
 
-The first-order ODE can also be numerically solved via discretisation.
+Although state space methods allow analysts to obtain closed form solutions, only kernels that possess simple forms in $s$-domain can be considered. If the characteristic equation is $s$-domain is a transcendental function or a higher order polynomial (the Abel--Ruffini theorem), the system would still be solved numerically in the sense that the eigenvalues can only be computed imprecisely. The converted first-order ODE can also be solved via numerical integration. However, since the order is lowered, its size increases accordingly. This often drastically increases computational cost.
+\subsection{Need of An Efficient Approach}
+Based on the above discussion, nonviscously damped systems would better be solved by an algorithm that possesses the following attributes.
+\begin{Objective}
+\begin{enumerate}
+\item It preserves the size of the original dynamic system.
+\item It maintains the accuracy of the time integration method used.
+\item It eliminates the need to integrate the convolution term for each substep.
+\item It can be used with various time integration methods and kernels in both elastic/inelastic systems.
+\end{enumerate}
+\end{Objective}
+
+This work presents an algorithm to incorporate arbitrary smooth kernels with direct time integration methods and explains the strategy in two parts.
+\begin{enumerate}
+\item For exponential kernels or kernels can be expressed as sums of exponentials, a nonviscously damped system can be equivalently rewritten into a second-order ODE and a first-order ODE. Both can be discretised and solved directly in the time domain with a performant formulation.
+\item Arbitrary smooth kernels can be approximated by sums of exponentials in a way that is independent of the dynamic system of interest. The approximation balances well between accuracy and efficiency.
+\end{enumerate}
+Numerical examples are presented with an emphasis on accuracy by comparing with analytical solutions (if available).
