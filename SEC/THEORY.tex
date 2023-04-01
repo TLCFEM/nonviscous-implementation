@@ -82,6 +82,7 @@ the linearised system to be solved is
 \end{gather}
 
 The local iteration body is summarised in \algoref{algo:single_model} with subscript $\left(\cdot\right)_{n+1}$ dropped for brevity.
+The steps with a leading \faMicrochip~symbol augment global effective stiffness and resistance to obtain $\bhat{K}$ and $\bhat{y}$. Those are additional steps that need to be computed compared to a conventional algorithm for nonviscously damped systems. Once convergence is achieved, it is necessary to store the history of nonviscous damping force $\bbf_n\leftarrow\bbf$.
 \begin{breakablealgorithm}
 \setstretch{1.8}
 \caption{iteration body of solving nonviscously damped system with one exponential kernel}\label{algo:single_model}
@@ -89,21 +90,21 @@ The local iteration body is summarised in \algoref{algo:single_model} with subsc
 \State \textbf{Input}: $\bbar{K}$, $\bu$, $\bv$, $\mb{y}$, $\mb{p}$ (quantities obtained via conventional manner as if there is no nonviscous damping) and $\bbf_n$
 \State \textbf{Output}: $\bu$
 \State compute $\bw$ from $\bv$
+\State \faMicrochip~compute nonviscous damping force $\bbf=\dfrac{2-s\Delta{}t}{2+s\Delta{}t}\bbf_n+\dfrac{m\Delta{}t}{2+s\Delta{}t}\bw_n+\dfrac{m\Delta{}t}{2+s\Delta{}t}\bw$\Comment{\eqsref{eq:discretised_c}}
 \State \faMicrochip~compute revised stiffness $\bhat{K}=\bbar{K}+\dfrac{m\Delta{}t}{2+s\Delta{}t}\mb{T}\ddfrac{\bv}{\bu}$\Comment{\eqsref{eq:revised_k}}
-\State \faMicrochip~compute revised resistance $\bhat{y}=\mb{y}+\dfrac{2-s\Delta{}t}{2+s\Delta{}t}\bbf_n+\dfrac{m\Delta{}t}{2+s\Delta{}t}\bw_n+\dfrac{m\Delta{}t}{2+s\Delta{}t}\bw$\Comment{\eqsref{eq:revised_y}}
+\State \faMicrochip~compute revised resistance $\bhat{y}=\mb{y}+\bbf$\Comment{\eqsref{eq:revised_y}}
 \State $\delta\bu=\bhat{K}^{-1}\left(\mb{p}-\bhat{y}\right)$\Comment{\eqsref{eq:revised_system}}
 \State update and return $\bu\leftarrow\bu+\delta\bu$
 \end{algorithmic}
 \end{breakablealgorithm}
-The steps with a leading \faMicrochip~symbol augment global effective stiffness and resistance to obtain $\bhat{K}$ and $\bhat{y}$. Those are additional steps that need to be computed compared to a conventional algorithm for nonviscously damped systems. Once convergence is achieved, it is necessary to store the history of nonviscous damping force $\bbf_n\leftarrow\bbf$.
 
 Upon careful comparison, it becomes evident that the algorithm presented bears resemblance to the one discussed by \citet{Adhikari2004}. However, there are significant differences between them. Specifically, \algoref{algo:single_model} tracks the history of nonviscous damping force, and it does not differentiate between full-rank and rank-deficient cases. As a result, it eliminates the need for any supplementary matrix factorisations. \algoref{algo:single_model} directly discretises the EOM without converting it to a first-order system via the state space.
 
-Unlike other algorithms, such as the one by \citet{Cortes2009}, \algoref{algo:single_model} does not impose additional requirements on the time integration method used. Some existing state space methods manage to eliminate the convolution integral term from the \textbf{continuous} version of \eqsref{eq:eom} \citep[see][]{Wagner2003,Wu2019}, which, in the writers' opinion, overcomplicates the solution procedure in the context of numerical analysis, given that the analytical first-order ODE in the state space would still need to be discretised \citep{Adhikari2004} and numerically integrated for general systems. Nonetheless, whenever analytical solutions are sought, those methods provide extra merits that direct time integration methods do not offer, at the cost of increasing computational cost.
+Unlike other algorithms, such as the one by \citet{Cortes2009}, \algoref{algo:single_model} does not impose additional requirements on the time integration method used. Some existing state space methods manage to eliminate the convolution integral term from the \textbf{continuous} version of \eqsref{eq:eom} \citep[see][]{Wagner2003,Wu2019}, which, in the writers' opinion, overcomplicates the solution procedure in the context of numerical analysis, given that the analytical first-order ODE in the state space would still need to be discretised \citep{Adhikari2004} and numerically integrated for general systems. Nonetheless, whenever analytical solutions are sought, those methods may provide extra merits that direct time integration methods do not offer, at the cost of increasing computational cost.
 \subsection{Complexity Analysis}
 The term $\mb{T}\ddfrac{\bv}{\bu}\delta\bu$ can be efficiently computed by masking $\delta\bu$ if $\mb{T}$ is a diagonal matrix while $\ddfrac{\bv}{\bu}$ can be equivalently converted into a scalar (see discussion before). Assuming the system has a size of $n$, it requires at most $n$ floating point number arithmetic. All three extra steps require pure vector operations, the total number of floating point number multiplications is $4n$, that is a time complexity of $\mathcal{O}\left(n\right)$.
 
-\algoref{algo:single_model} requires no memory reallocation, the additional storage needed is for the nonviscous damping forces $f_n$, implying a space complexity of $\mathcal{O}\left(n\right)$.
+\algoref{algo:single_model} requires no memory reallocation, the additional storage needed is for the nonviscous damping forces $\bbf_n$, implying a space complexity of $\mathcal{O}\left(n\right)$.
 \section{Nonviscous Damping With Arbitrary Kernel}
 \algoref{algo:single_model} alone does not enable adoption of arbitrary kernel functions, thus, has limited applicability. In this section, we present the strategy of modelling arbitrary kernels using \algoref{algo:single_model} as the foundation.
 \subsection{Sum of Exponentials}
@@ -115,7 +116,7 @@ where $m_l$ and $s_l$ can now be complex numbers, then
 \begin{gather}\label{eq:sum_conv}
 \bbf=g*\bw=\sum_{l=1}^{j}g_l*\bw=\sum_{l=1}^{j}\bbf_l.
 \end{gather}
-For each of $\bbf_l$, \eqsref{eq:discretised_c} also holds and only involves $\bbf_l$ itself and the common quantity $\bw$. Thus,
+For each $\bbf_l$, \eqsref{eq:discretised_c} also holds and only involves $\bbf_l$ itself and the common quantity $\bw$. Thus,
 \begin{gather}
 \bbf_l=\dfrac{2-s_l\Delta{}t}{2+s_l\Delta{}t}\bbf_n+\dfrac{m_l\Delta{}t}{2+s_l\Delta{}t}\bw_n+\dfrac{m_l\Delta{}t}{2+s_l\Delta{}t}\bw.
 \end{gather}
@@ -154,15 +155,13 @@ the time and space complexity is $\mathcal{O}\left(ij^\text{max}n\right)$.
 \subsection{Arbitrary Kernel}
 It is clear that the Fourier transform (exponential form) allows one to express arbitrary smooth function $g\left(t\right)$ as an infinite sum of exponentials, even if $g\left(t\right)$ is non-periodic. It is possible to approximate $g\left(t\right)$ if a fast converging exponential series can be found.
 
-By using partial sums and model reduction, \citet{Gao2022} presented such a method, named as VPMR, with controllable magnitudes of exponents, formally,
+One can use Prony's method \citep[see, e.g.,][]{Hamming1987} and its derivations \citep{Hokanson2013} to find a proper approximation. However, it tends to have a slow convergence \citep{Trudnowski1999} which inevitably leads to a large number of exponentials that would impair computational efficiency. By further adopting model reduction, \citet{Gao2022} presented a method, named as VPMR, with controllable magnitudes of exponents and fast convergence, to compute the desired approximation, formally,
 \begin{gather}
 \max_{t\in{}I}{\abs{g\left(t\right)-\sum_jm_j\exp\left(-s_jt\right)}}<\epsilon,
 \end{gather}
 where $I$ is a finite interval that could be an arbitrary subset of $\mathbb{R}^+$, $\epsilon$ is the error tolerance.
 
-By using VPMR, it is feasible to convert nonviscous damping with arbitrary (in terms of both number and form) kernels applied to the dynamic system into the form of \eqsref{eq:composition}.
-
-By assigning a tolerance close to (or less than) the machine error, an accurate equivalence of arbitrary kernel function can be obtained for nonviscous damping computation. In practice, such a tolerance only needs to be smaller than the analysis tolerance.
+By using VPMR, it is feasible to convert nonviscous damping with arbitrary (in terms of both number and form) kernels applied to the dynamic system into the form of \eqsref{eq:composition}. Noting that $\epsilon$ is a user input, by assigning a tolerance close to (or less than) machine epsilon --- around \num{e-16} for double precision floating point representation, an accurate equivalence of arbitrary kernel function can be obtained for nonviscous damping computation. In practice, such a tolerance only needs to be smaller than the analysis tolerance.
 
 \begin{enumerate}
 \item Determine number and form of kernels $g^k$ to be used.
@@ -175,4 +174,4 @@ By assigning a tolerance close to (or less than) the machine error, an accurate 
 \item Use proper time integration method to solve the system.
 \end{enumerate}
 
-It is worth emphasising that converting the desired kernel functions to sums of exponentials a) is independent of the dynamic system of interest and b) is performed ahead of (time history analysis) time.
+It is worth emphasising that converting the desired kernel functions to sums of exponentials a) is independent of the dynamic system of interest and b) is performed offline, viz., ahead of time.

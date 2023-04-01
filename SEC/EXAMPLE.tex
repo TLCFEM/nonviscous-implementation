@@ -59,7 +59,7 @@ g_1=\num{0.6}\exp\left(-t\right),\qquad
 g_2=\exp\left(-\num{5}t\right).
 \end{gather}
 The initial conditions are $x_1\left(0\right)=1$, $x_2\left(0\right)=x_3\left(0\right)=0$, and $\dot{x}_1\left(0\right)=\dot{x}_2\left(0\right)=\dot{x}_3\left(0\right)=0$. One can compute the initial acceleration using the analytical solution such that $\ddot{x}_1\left(0\right)=-4/3$, $\ddot{x}_2\left(0\right)=2/3$ and $\ddot{x}_3\left(0\right)=0$.
-The analytical solution can be obtained via modal analysis/expansion, the relevant derivations can be seen elsewhere \citep[see][\S~4.6.2]{Adhikari2014}.
+The analytical solution can be obtained via modal analysis/expansion, the relevant derivations can be seen elsewhere \citep{Wagner2003}.
 The Newmark (constant acceleration) method is used for time integration.
 
 The displacement histories of three DoFs are depicted in \figref{fig:three}.
@@ -69,7 +69,7 @@ The displacement histories of three DoFs are depicted in \figref{fig:three}.
 \caption{displacement history and error analysis of three DOF system with two exponential kernels}\label{fig:three}
 \end{figure}
 
-Compared to the numerical solutions (with $\Delta{}t=\SI{0.05}{\second}$) obtained by \citet{Cortes2009}, the present algorithm yields more accurate results. Even for a large time step $\Delta{}t=\SI{0.1}{\second}$, unlike other methods \citep{Liu2023}, there is no severe deviation observed.
+Compared to the numerical solutions (with $\Delta{}t=\SI{0.05}{\second}$) obtained by \citet{Cortes2009}, the present algorithm yields more accurate results. Even for a large time step $\Delta{}t=\SI{0.1}{\second}$, there is no severe deviation observed, unlike some other methods \citep{Puthanpurayil2014,Liu2014} that poorly integrate the convolution term. Additional error convergence comparisons can be seen elsewhere \citep{Liu2023}.
 
 The convergence of absolute error again shows a quadratic order, implying the simple \eqsref{eq:eqv_sys} is effective.
 
