@@ -35,4 +35,4 @@ LS = get_line_style()
 class Response:
     time: np.ndarray
     displacement: np.ndarray
-    error: np.ndarray
+    error: np.ndarray = None

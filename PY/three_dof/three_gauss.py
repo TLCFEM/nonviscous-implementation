@@ -1,10 +1,8 @@
 import h5py
 import matplotlib
-import numpy as np
 from matplotlib import pyplot as plt
-from scipy.stats import linregress
 
-from PY.Utility import LS, Response
+from PY.Utility import Response
 from PY.three_dof.three_dof import add_plot
 
 matplotlib.rcParams.update({'font.size': 6})
@@ -21,9 +19,9 @@ def numerical(pick):
         displacement2 = data2[:, 1]
         displacement3 = data3[:, 1]
 
-    return (Response(time, displacement1, None),
-            Response(time, displacement2, None),
-            Response(time, displacement3, None))
+    return (Response(time, displacement1),
+            Response(time, displacement2),
+            Response(time, displacement3))
 
 
 def three_dof():
