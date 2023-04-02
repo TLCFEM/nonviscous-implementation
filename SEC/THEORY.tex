@@ -153,6 +153,8 @@ j^\text{max}=\max_{k\in\{1,2,\cdots,i\}}\left(j^k\right),
 \end{gather}
 the time and space complexity is $\mathcal{O}\left(ij^\text{max}n\right)$.
 \subsection{Arbitrary Kernel}
+Sum of exponentials is able to provide a wide coverage of various kernel functions \citep[c.f.,]{Adhikari2003}, as a decent amount of kernels can be equivalently expressed as sums of exponentials.
+
 It is clear that the Fourier transform (exponential form) allows one to express arbitrary smooth function $g\left(t\right)$ as an infinite sum of exponentials, even if $g\left(t\right)$ is non-periodic. It is possible to approximate $g\left(t\right)$ if a fast converging exponential series can be found.
 
 One can use Prony's method \citep[see, e.g.,][]{Hamming1987} and its derivations \citep{Hokanson2013} to find a proper approximation. However, it tends to have a slow convergence \citep{Trudnowski1999} which inevitably leads to a large number of exponentials that would impair computational efficiency. By further adopting model reduction, \citet{Gao2022} presented a method, named as VPMR, with controllable magnitudes of exponents and fast convergence, to compute the desired approximation, formally,
