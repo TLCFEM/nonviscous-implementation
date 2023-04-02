@@ -96,3 +96,8 @@ For $\Delta{}t\approx\num{e-3}$, quadratic convergence implies the error is arou
 For this particular example with a few DoFs and elements, the extra time required by nonviscous damping (\num{13} exponentials) is around \SI{15}{\percent} of total analysis time. Noting that the approximation of kernel is computed offline and does not change with the size of dynamic system, it can be extrapolated that for large systems, the cost of computing \eqsref{eq:composition} is not subtle.
 \subsection{A Frame Structure}
 
+\begin{figure}[H]
+\centering
+\includegraphics{PY/kernel2}
+\caption{sigmoid kernel}\label{fig:sigmoid_kernel}
+\end{figure}
