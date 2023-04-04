@@ -118,7 +118,7 @@ where $m_l$ and $s_l$ can now be complex numbers, then
 \end{gather}
 For each $\bbf_l$, \eqsref{eq:discretised_c} also holds and only involves $\bbf_l$ itself and the common quantity $\bw$. Thus,
 \begin{gather}
-\bbf_l=\dfrac{2-s_l\Delta{}t}{2+s_l\Delta{}t}\bbf_n+\dfrac{m_l\Delta{}t}{2+s_l\Delta{}t}\bw_n+\dfrac{m_l\Delta{}t}{2+s_l\Delta{}t}\bw.
+\bbf_l=\dfrac{2-s_l\Delta{}t}{2+s_l\Delta{}t}\bbf_{l,n}+\dfrac{m_l\Delta{}t}{2+s_l\Delta{}t}\bw_n+\dfrac{m_l\Delta{}t}{2+s_l\Delta{}t}\bw.
 \end{gather}
 
 Similar to the single function case, substituting $\bbf_l$ into \eqsref{eq:eom}, differentiation yields the revised stiffness
@@ -127,12 +127,12 @@ Similar to the single function case, substituting $\bbf_l$ into \eqsref{eq:eom},
 \end{gather}
 and the revised resistance
 \begin{gather}\label{eq:revised_y_multi}
-\bhat{y}=\mb{y}+\sum_{l=1}^{j}\dfrac{2-s_l\Delta{}t}{2+s_l\Delta{}t}\bbf_n+\sum_{l=1}^{j}\dfrac{m_l\Delta{}t}{2+s_l\Delta{}t}\bw_n+\sum_{l=1}^{j}\dfrac{m_l\Delta{}t}{2+s_l\Delta{}t}\bw.
+\bhat{y}=\mb{y}+\sum_{l=1}^{j}\dfrac{2-s_l\Delta{}t}{2+s_l\Delta{}t}\bbf_{l,n}+\sum_{l=1}^{j}\dfrac{m_l\Delta{}t}{2+s_l\Delta{}t}\bw_n+\sum_{l=1}^{j}\dfrac{m_l\Delta{}t}{2+s_l\Delta{}t}\bw.
 \end{gather}
 
 Noting that within each sum, the operations performed are identical to that in the single function case, the complexity, in this case, is $\mathcal{O}\left(jn\right)$ for both time and space. As long as parameters $m_l$ and $s_l$ are real or pairs of complex conjugates, $\bbf$ is guaranteed to be real.
-\subsection{Composition}
-It is possible to assign different kernels to different subsets of the velocity vector. Formally,
+\subsection{Damping Composition}
+It is possible to assign different kernels to different subsets of the velocity vector. Formally, instead of \eqsref{eq:sum_conv},
 \begin{gather}
 \bbf=\sum_{k=1}^{i}g^k*\bw^k,
 \end{gather}
@@ -140,7 +140,7 @@ where $g^k$ is the kernel applied to $\bw^k$, if $g^k$ can be expressed as the s
 \begin{gather}
 g^k=\sum_{l=1}^{j^k}g_l^k\left(t\right)=\sum_{l=1}^{j^k}m_l^k\exp\left(-s_l^kt\right),
 \end{gather}
-in its explicit form
+in its explicit form,
 \begin{gather}\label{eq:composition}
 \bbf=\sum_{k=1}^{i}\sum_{l=1}^{j^k}\bbf_l^k=\sum_{k=1}^{i}\sum_{l=1}^{j^k}g_l^k\left(t\right)\bw^k=\sum_{k=1}^{i}\sum_{l=1}^{j^k}m_l^k\exp\left(-s_l^kt\right)\bw^k.
 \end{gather}
@@ -149,14 +149,13 @@ Since additivity still holds, there is no essential difference between \eqsref{e
 
 Denoting
 \begin{gather}
-j^\text{max}=\max_{k\in\{1,2,\cdots,i\}}\left(j^k\right),
+j_\text{max}=\max_{k\in\{1,2,\cdots,i\}}\left(j^k\right),
 \end{gather}
-the time and space complexity is $\mathcal{O}\left(ij^\text{max}n\right)$.
+the time and space complexity is $\mathcal{O}\left(ij_\text{max}n\right)$.
 \subsection{Arbitrary Kernel}
-Sum of exponentials is able to provide a wide coverage of various kernel functions \citep[c.f.,]{Adhikari2003}, as a decent amount of kernels can be equivalently expressed as sums of exponentials.
+Sum of exponentials is able to provide a wide coverage of various kernel functions \citep[c.f.,][]{Adhikari2003}, as a decent amount of kernels can be equivalently expressed as sums of exponentials.
 
 It is clear that the Fourier transform (exponential form) allows one to express arbitrary smooth function $g\left(t\right)$ as an infinite sum of exponentials, even if $g\left(t\right)$ is non-periodic. It is possible to approximate $g\left(t\right)$ if a fast converging exponential series can be found.
-
 One can use Prony's method \citep[see, e.g.,][]{Hamming1987} and its derivations \citep{Hokanson2013} to find a proper approximation. However, it tends to have a slow convergence \citep{Trudnowski1999} which inevitably leads to a large number of exponentials that would impair computational efficiency. By further adopting model reduction, \citet{Gao2022} presented a method, named as VPMR, with controllable magnitudes of exponents and fast convergence, to compute the desired approximation, formally,
 \begin{gather}
 \max_{t\in{}I}{\abs{g\left(t\right)-\sum_jm_j\exp\left(-s_jt\right)}}<\epsilon,

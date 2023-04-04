@@ -19,6 +19,8 @@ jobs:
           python three_dof.py
           python three_gauss.py
           python kernel.py
+          cd ../three_stiff
+          python three_stiff.py
           cd ../..
       - name: Compile
         uses: xu-cheng/texlive-action/full@v1

@@ -1,14 +1,14 @@
 \section{Numerical Examples}
 In the following examples, units are omitted for brevity.
+The Newmark (constant acceleration) method is used for time integration unless stated otherwise.
 \subsection{SDOF System With Single Exponential}
 We start with the validation of \algoref{algo:single_model}. To this end, consider the free vibration of a SDOF system with one exponential kernel such that the EOM can be expressed as
 \begin{gather}
 m\ddot{u}\left(t\right)+\int_0^tc\mu\exp\left(-\mu\left(t-\tau\right)\right)\dot{u}\left(\tau\right)\md{\tau}+ku\left(t\right)=0.
 \end{gather}
 The parameters are set to $m=1$, $c=2$, $\mu=1$, $k=100$.
-The initial conditions are $u\left(0\right)=1$, $\dot{u}\left(0\right)=1$ and $\ddot{u}\left(0\right)=1$.
+The initial conditions are $u\left(0\right)=1$, $\dot{u}\left(0\right)=0$ and $\ddot{u}\left(0\right)=-100$.
 The closed form solution can be found in \secref{sec:analytical_sdof}.
-The Newmark (constant acceleration) method is used for time integration.
 The displacement history and the corresponding error convergence are shown in \figref{fig:sdof}.
 
 The maximum of the difference between numerical and analytical solutions is taken as the absolute error $\epsilon$. It is evident that \eqsref{eq:discretised_c} retains the second-order accuracy of the Newmark method.
@@ -56,11 +56,10 @@ A three-degree-of-freedom system shown in \figref{fig:three_dof} is adopted to d
 The parameters are set to $m=3$, $k=2$ and
 \begin{gather}
 g_1=\num{0.6}\exp\left(-t\right),\qquad
-g_2=\exp\left(-\num{5}t\right).
+g_2=\exp\left(-5t\right).
 \end{gather}
 The initial conditions are $x_1\left(0\right)=1$, $x_2\left(0\right)=x_3\left(0\right)=0$, and $\dot{x}_1\left(0\right)=\dot{x}_2\left(0\right)=\dot{x}_3\left(0\right)=0$. One can compute the initial acceleration using the analytical solution such that $\ddot{x}_1\left(0\right)=-4/3$, $\ddot{x}_2\left(0\right)=2/3$ and $\ddot{x}_3\left(0\right)=0$.
 The analytical solution can be obtained via modal analysis/expansion, the relevant derivations can be seen elsewhere \citep{Wagner2003}.
-The Newmark (constant acceleration) method is used for time integration.
 
 The displacement histories of three DoFs are depicted in \figref{fig:three}.
 \begin{figure}[H]
@@ -69,14 +68,30 @@ The displacement histories of three DoFs are depicted in \figref{fig:three}.
 \caption{displacement history and error analysis of three DOF system with two exponential kernels}\label{fig:three}
 \end{figure}
 
-Compared to the numerical solutions (with $\Delta{}t=\SI{0.05}{\second}$) obtained by \citet{Cortes2009}, the present algorithm yields more accurate results. Even for a large time step $\Delta{}t=\SI{0.1}{\second}$, there is no severe deviation observed, unlike some other methods \citep{Puthanpurayil2014,Liu2014} that poorly integrate the convolution term. Additional error convergence comparisons can be seen elsewhere \citep{Liu2023}.
+Compared to the numerical solutions (with $\Delta{}t=\SI{0.05}{\second}$) obtained by \citet{Cortes2009}, the present algorithm yields more accurate results. Even for a large time step $\Delta{}t=\SI{0.1}{\second}$, there is no severe deviation observed, unlike some other methods \citep{Puthanpurayil2014,Liu2014} that poorly integrate the convolution term. Additional error convergence comparisons can be seen elsewhere \citep{Liu2023}. The convergence of absolute error again shows a quadratic order, implying the simple \eqsref{eq:eqv_sys} is effective.
+\subsection{Three DOF System With Stiff Exponential Kernels}
+The two exponential kernels in the previous example are modified to investigate whether the proposed algorithm can cope with stiff problems. The following functions are chosen.
+\begin{gather}
+g_1=600\exp\left(-1000t\right),\qquad
+g_2=400\exp\left(-2000t\right).
+\end{gather}
 
-The convergence of absolute error again shows a quadratic order, implying the simple \eqsref{eq:eqv_sys} is effective.
-
+The corresponding displacement history and error convergence are shown in \figref{fig:three_stiff}. With a large $\mu$, the system behaves more like a viscously damped one.
+\begin{figure}[H]
+\centering
+\includegraphics{PY/three_stiff}
+\caption{displacement history and error analysis of three DOF system with stiff exponential kernels}\label{fig:three_stiff}
+\end{figure}
+The second-order convergence is not affected by the stiff kernel used. This is difficult to achieve with methods that explicit integrate the convolution term if the large time step is not split into smaller segments. Consider a time step of $\Delta{}t=\SI{0.01}{\second}$,
+\begin{gather}
+g_1\left(0\right)=600,\qquad
+g_1\left(0.01\right)\approx\num{0.027},\qquad\int_{0}^{0.01}g_1~\md{t}\approx0.599973.
+\end{gather}
+Such a rapidly changing function within $t\in[0,0.01]$ can hardly be accurately integrated by solely using values at two ends.
 \subsection{Three DOF System With Two Gaussian Kernels}
 In the previous example, instead of two exponential kernels, two Gaussian kernels
 \begin{gather}
-g_1=1.2\sqrt{\dfrac{1}{\pi}}\exp\left(-t^2\right),\\
+g_1=1.2\sqrt{\dfrac{1}{\pi}}\exp\left(-t^2\right),\qquad
 g_2=0.4\sqrt{\dfrac{5}{\pi}}\exp\left(-5t^2\right),
 \end{gather}
 can be used. The sum-of-exponential approximations given by the VPMR algorithm are shown in \figref{fig:vpmr}. With a tolerance around \num{e-12}, only \num{13} exponentials are required. The corresponding $m_l$ and $s_l$ parameters are given in \secref{sec:vpmr}.
