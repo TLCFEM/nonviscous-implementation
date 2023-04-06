@@ -10,7 +10,7 @@ matplotlib.rcParams.update({'font.size': 6})
 
 def numerical(pick):
     name = 'R1-U1'
-    with h5py.File(f'{name}-G{str(pick)}.h5', 'r') as f:
+    with h5py.File(f'{name}-{str(pick)}.h5', 'r') as f:
         data1 = f[f'/{name}/{name}2']
         data2 = f[f'/{name}/{name}3']
         data3 = f[f'/{name}/{name}4']
@@ -24,29 +24,31 @@ def numerical(pick):
             Response(time, displacement3))
 
 
-def three_dof():
+def sigmoid():
     results = {
-        '0.1': numerical(0.1), '0.05': numerical(0.05), '0.02': numerical(0.02), '0.01': numerical(0.01),
-        '0.005': numerical(0.005)}
+        '0.001': numerical(0.001),
+        '0.01': numerical(0.01),
+        '0.1': numerical(0.1)
+    }
 
     fig = plt.figure(figsize=(6, 2))
 
     ax1 = plt.gca()
 
     add_plot(ax1, results, '0.1', 1.4)
-    add_plot(ax1, results, '0.005', 1.4)
+    add_plot(ax1, results, '0.01', 1.4)
 
     plt.xlabel('time (s)')
     plt.ylabel('displacement')
     plt.grid(which='both', axis='both', linestyle='--', linewidth=.2)
-    plt.xlim(0, 30)
+    plt.xlim(0, 20)
 
     plt.legend(handlelength=4, ncols=2)
 
     fig.tight_layout(pad=.1)
     plt.show()
-    fig.savefig('../three_gauss.pdf')
+    fig.savefig('../sigmoid.pdf')
 
 
 if __name__ == '__main__':
-    three_dof()
+    sigmoid()
