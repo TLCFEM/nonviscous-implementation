@@ -1,4 +1,4 @@
-on: [push]
+on: [ push ]
 jobs:
   build_latex:
     runs-on: ubuntu-latest
@@ -21,6 +21,8 @@ jobs:
           python kernel.py
           cd ../three_stiff
           python three_stiff.py
+          cd ../sigmoid
+          python sigmoid.py
           cd ../..
       - name: Compile
         uses: xu-cheng/texlive-action/full@v1
