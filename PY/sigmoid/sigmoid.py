@@ -26,7 +26,6 @@ def numerical(pick):
 
 def sigmoid():
     results = {
-        '0.001': numerical(0.001),
         '0.01': numerical(0.01),
         '0.1': numerical(0.1)
     }
