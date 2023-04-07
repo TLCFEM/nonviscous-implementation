@@ -61,16 +61,24 @@ Expanding and rearranging lead to
 \end{gather}
 in which subscripts $\left(\cdot\right)_{n+1}$ and $\left(\cdot\right)_n$ denote the corresponding quantity at $t_n$ and $t_{n+1}=t_n+\Delta{}t$.
 
-Assuming \eqsref{eq:eom} is satisfied at $t_{n+1}$, then, accounting for \eqsref{eq:discretised_c}, \eqsref{eq:eom} is
+Assuming the Newmark method is used for \eqsref{eq:eom}, viz., \eqsref{eq:eom} is satisfied at $t_{n+1}$, then, accounting for \eqsref{eq:discretised_c}, \eqsref{eq:eom} is
 \begin{gather}\label{eq:residual}
 \mb{y}_{n+1}+\dfrac{2-s\Delta{}t}{2+s\Delta{}t}\bbf_n+\dfrac{m\Delta{}t}{2+s\Delta{}t}\bw_n+\dfrac{m\Delta{}t}{2+s\Delta{}t}\bw_{n+1}=\mb{p}_{n+1}.
 \end{gather}
-Note that this assumption is not always valid as some time integration methods establish the EOM elsewhere, see, for example, the generalised-$\alpha$ method \citep{Chung1993}, the GSSSS method \citep{Zhou2003}, the Bathe two-step method \citep{Noh2019}, the OALTS method \citep{Zhang2021}, etc. In those cases, \eqsref{eq:residual} needs to be modified accordingly.
 Differentiation leads to the following revised effective stiffness $\bhat{K}_{n+1}$,
 \begin{gather}\label{eq:revised_k}
 \bhat{K}_{n+1}=\bbar{K}_{n+1}+\dfrac{m\Delta{}t}{2+s\Delta{}t}\mb{T}\ddfrac{\bv_{n+1}}{\bu_{n+1}}.
 \end{gather}
 Typically, $\ddfrac{\bv}{\bu}$ reduces to a scalar constant (multiplied by an identity matrix), for example, in the Newmark method, it is $\dfrac{\gamma}{\beta\Delta{}t}$.
+\begin{Objective}
+\paragraph{Remark}
+If other direct time integration methods are used for \eqsref{eq:eom}, other methods can be applied to \eqsref{eq:single_conv_ode}. The following are some examples.
+\begin{enumerate}
+\item For the Bathe two-step method \citep{Noh2019}, the TR-BDF2 method \citep{Bank1985} can be used.
+\item For the OALTS method \citep{Zhang2021}, the BDF2 method can be used.
+\item For the generalised-$\alpha$ method \citep{Chung1993} and the GSSSS method \citep{Zhou2003}, the variable step size BDF2 method can be used.
+\end{enumerate}
+\end{Objective}
 
 By introducing the revised resistance $\bhat{y}_{n+1}$ as
 \begin{gather}\label{eq:revised_y}
