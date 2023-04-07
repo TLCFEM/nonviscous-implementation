@@ -68,17 +68,20 @@
 \linenumbers
 \begin{abstract}
 \begin{linenumbers}
-In this work, we propose a fast algorithm to evaluate the dynamic response of nonviscously damped systems with arbitrary distributions of damping characterised by arbitrary kernel functions (both number and form). The proposed algorithm is independent from time integration methods and requires mere level 2 BLAS operations.
+In this work, a fast algorithm to evaluate the dynamic response of nonviscously damped systems with arbitrary distributions of damping characterised by arbitrary kernel functions (both number and form) is proposed. The proposed algorithm requires mere level 2 BLAS operations. It can be integrated into existing analysis tools with various time integration methods in forms of either element-based dashpots or global damping model. Compared to other existing methods, the proposed algorithm shows superior accuracy while the corresponding computational cost is low.
 \end{linenumbers}
 \end{abstract}
 \begin{keyword}
+nonviscous damping\sep
+direct integration\sep
+arbitrary kernel
 \end{keyword}
 \begin{frontmatter}
 \title{A Strategy for Fast Evaluation of Nonviscously Damped Systems With Arbitrary Kernels}
-%\author[add1]{Theodore~L.~Chang\corref{tlc}}\ead{tlcfem@gmail.com}
+\author[add1]{Theodore~L.~Chang\corref{tlc}}\ead{tlcfem@gmail.com}
 %\author[add2]{Chin-Long~Lee}
-%\cortext[tlc]{corresponding author}
-%\address[add1]{IRIS Adlershof, Humboldt-Universität zu Berlin, Berlin, Germany, 12489.}
+\cortext[tlc]{corresponding author}
+\address[add1]{IRIS Adlershof, Humboldt-Universität zu Berlin, Berlin, Germany, 12489.}
 %\address[add2]{Department of Civil and Natural Resources Engineering, University of Canterbury, Christchurch, New Zealand, 8041.}
 \end{frontmatter}
 \input{SEC/INTRO}

@@ -6,7 +6,7 @@ Without loss of generality, consider the equation of motion of a nonviscously da
 \end{gather}
 where $\mb{y}=\mb{y}\left(\bu,\bv,\ba\right)$ is the resistance vector of the system, $\mb{p}=\mb{p}\left(t\right)$ is the external load vector, $\bu=\bu\left(t\right)$, $\bv=\bv\left(t\right)=\dot{\bu}$ and $\ba=\ba\left(t\right)=\dot{\bv}$ are the displacement, velocity and acceleration vectors, and $\bbf$ is the nonviscous damping force which can be expressed in the form of the convolution of the kernel $g=g\left(t\right)$ and the vector $\bw$, viz., $\bbf\left(t\right)=\left(g*\bw\right)\left(t\right)$.
 
-Note here, $\bw$ can be either the exact velocity vector $\bv$, or the subset of $\bv$ such that they share the same size but some velocity components in $\bv$ are replaced by zeros in $\bw$ on selected DoFs. This is beneficial when it comes to compositing flexible damping which will be discussed later in this work. Formally, it can be represented by
+Note here, $\bw$ can be either the exact velocity vector $\bv$, or a vector that depends on $\bv$ (e.g., a subset of $\bv$). This is beneficial when it comes to compositing flexible damping which will be discussed later in this work. Formally, it can be represented by
 \begin{gather}
 \bw=\mb{T}\bv,
 \end{gather}
@@ -23,7 +23,7 @@ The viscous damping matrix $\mb{C}$ may not be trivial as the system may consist
 \bbar{K}=\ddfrac{\mb{y}}{\bu}=\mb{K}+\mb{C}\ddfrac{\bv}{\bu}+\mb{M}\ddfrac{\ba}{\bu}
 \end{gather}
 is the combination of the three, its specific form depends on the specific time integration method used.
-\section{Nonviscous Damping With A Single Exponential Kernel}
+\section{Nonviscous Damping With A Single Exponential Kernel}\label{sec:single}
 The present section introduces an enhancement of the algorithm proposed by \citet{Adhikari2004} through optimisation. The improvement is accomplished by reformulating the algorithm into a form that enables the integration of arbitrary kernel functions.
 \subsection{A Single Exponential Kernel}
 We start with the scalar-valued exponential kernel function
@@ -90,7 +90,7 @@ the linearised system to be solved is
 \end{gather}
 
 The local iteration body is summarised in \algoref{algo:single_model} with subscript $\left(\cdot\right)_{n+1}$ dropped for brevity.
-The steps with a leading \faMicrochip~symbol augment global effective stiffness and resistance to obtain $\bhat{K}$ and $\bhat{y}$. Those are additional steps that need to be computed compared to a conventional algorithm for nonviscously damped systems. Once convergence is achieved, it is necessary to store the history of nonviscous damping force $\bbf_n\leftarrow\bbf$.
+The steps with a leading \faMicrochip~symbol augment global effective stiffness and resistance to obtain $\bhat{K}$ and $\bhat{y}$. Those are additional steps that need to be computed compared to a conventional algorithm for viscously damped systems. Once convergence is achieved, it is necessary to store the history of nonviscous damping force $\bbf_n\leftarrow\bbf$.
 \begin{breakablealgorithm}
 \setstretch{1.8}
 \caption{iteration body of solving nonviscously damped system with one exponential kernel}\label{algo:single_model}
@@ -106,14 +106,14 @@ The steps with a leading \faMicrochip~symbol augment global effective stiffness 
 \end{algorithmic}
 \end{breakablealgorithm}
 
-Upon careful comparison, it becomes evident that the algorithm presented bears resemblance to the one discussed by \citet{Adhikari2004}. However, there are significant differences between them. Specifically, \algoref{algo:single_model} tracks the history of nonviscous damping force, and it does not differentiate between full-rank and rank-deficient cases. As a result, it eliminates the need for any supplementary matrix factorisations. \algoref{algo:single_model} directly discretises the EOM without converting it to a first-order system via the state space.
+Upon careful comparison, it becomes evident that the algorithm presented bears resemblance to the one discussed by \citet{Adhikari2004}. However, there are differences between them. Specifically, \algoref{algo:single_model} tracks the history of nonviscous damping force, and it does not differentiate between full-rank and rank-deficient cases. As a result, it eliminates the need for any supplementary matrix factorisations. \algoref{algo:single_model} directly discretises the EOM without converting it to a first-order system via the state space.
 
 Unlike other algorithms, such as the one by \citet{Cortes2009}, \algoref{algo:single_model} does not impose additional requirements on the time integration method used. Some existing state space methods manage to eliminate the convolution integral term from the \textbf{continuous} version of \eqsref{eq:eom} \citep[see][]{Wagner2003,Wu2019}, which, in the writers' opinion, overcomplicates the solution procedure in the context of numerical analysis, given that the analytical first-order ODE in the state space would still need to be discretised \citep{Adhikari2004} and numerically integrated for general systems. Nonetheless, whenever analytical solutions are sought, those methods may provide extra merits that direct time integration methods do not offer, at the cost of increasing computational cost.
 \subsection{Complexity Analysis}
 The term $\mb{T}\ddfrac{\bv}{\bu}\delta\bu$ can be efficiently computed by masking $\delta\bu$ if $\mb{T}$ is a diagonal matrix while $\ddfrac{\bv}{\bu}$ can be equivalently converted into a scalar (see discussion before). Assuming the system has a size of $n$, it requires at most $n$ floating point number arithmetic. All three extra steps require pure vector operations, the total number of floating point number multiplications is $4n$, that is a time complexity of $\mathcal{O}\left(n\right)$.
 
 \algoref{algo:single_model} requires no memory reallocation, the additional storage needed is for the nonviscous damping forces $\bbf_n$, implying a space complexity of $\mathcal{O}\left(n\right)$.
-\section{Nonviscous Damping With Arbitrary Kernel}
+\section{Nonviscous Damping With Arbitrary Kernel}\label{sec:arbitrary}
 \algoref{algo:single_model} alone does not enable adoption of arbitrary kernel functions, thus, has limited applicability. In this section, we present the strategy of modelling arbitrary kernels using \algoref{algo:single_model} as the foundation.
 \subsection{Sum of Exponentials}
 Now consider, instead of a single exponential function, multiple exponential functions such that
@@ -172,15 +172,16 @@ where $I$ is a finite interval that could be an arbitrary subset of $\mathbb{R}^
 
 By using VPMR, it is feasible to convert nonviscous damping with arbitrary (in terms of both number and form) kernels applied to the dynamic system into the form of \eqsref{eq:composition}. Noting that $\epsilon$ is a user input, by assigning a tolerance close to (or less than) machine epsilon --- around \num{e-16} for double precision floating point representation, an accurate equivalence of arbitrary kernel function can be obtained for nonviscous damping computation. In practice, such a tolerance only needs to be smaller than the analysis tolerance.
 
+It is worth emphasising that converting the desired kernel functions to sums of exponentials a) is independent of the dynamic system of interest and b) is performed offline, viz., ahead of time. Combining with \algoref{algo:single_model}, the following procedure can be employed to model nonviscously damped systems with arbitrary kernels.
+\begin{Objective}
 \begin{enumerate}
 \item Determine number and form of kernels $g^k$ to be used.
 \item Approximate time step size $\Delta{}t$ that would be used.
 \item Use the VPMR algorithm \citep{Gao2022} to find approximations of kernels with tolerance set to $\Delta{}t^2$ such that for each $k$,
 \begin{gather}
-\norm{g^k-\sum_lg^k_l}<\Delta{}t.
+\abs{g^k-\sum_lg^k_l}<\Delta{}t^2.
 \end{gather}
 \item Formulate damping matrix and resistance using exponentials found by VPMR for each kernel. Each kernel would be applied to selected nodes/elements.
-\item Use proper time integration method to solve the system.
+\item Use \algoref{algo:single_model} with proper time integration method to solve the system.
 \end{enumerate}
-
-It is worth emphasising that converting the desired kernel functions to sums of exponentials a) is independent of the dynamic system of interest and b) is performed offline, viz., ahead of time.
+\end{Objective}
