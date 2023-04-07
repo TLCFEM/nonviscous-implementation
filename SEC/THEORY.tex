@@ -39,7 +39,7 @@ The convolution can be then expressed as
 \begin{gather}\label{eq:single_conv_ode}
 \dot{\bbf}=-s\bbf+m\bw.
 \end{gather}
-It can be validated by solving \eqsref{eq:single_conv_ode} with the assistance of the integrating factor $\exp\left(st\right)$. Here it is assumed that $\bbf\left(0\right)=\mb{0}$. \eqsref{eq:single_conv_ode} and its similar forms are widely used in constitutive modelling in terms of viscoelastic materials and hardening rules \citep[see, e.g.,][]{Chaboche1989}.
+It can be validated by solving \eqsref{eq:single_conv_ode} with the assistance of the integrating factor $\exp\left(st\right)$. Here it is assumed that $\bbf\left(0\right)=\mb{0}$. \eqsref{eq:single_conv_ode} and its similar forms are widely used in constitutive modelling in terms of viscoelastic materials \citep[e.g.,][]{Muravyov1998} and hardening rules \citep[e.g.,][]{Chaboche1989}.
 \subsection{An Efficient Direct Time Integration Algorithm}
 Instead of directly integrating \eqsref{eq:single_conv} using higher-order methods (such as the Runge--Kutta family), to develop an efficient algorithm, \eqsref{eq:single_conv_ode} can be combined with \eqsref{eq:eom} such that the system becomes
 \begin{gather}\label{eq:eqv_sys}
