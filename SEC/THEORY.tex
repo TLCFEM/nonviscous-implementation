@@ -70,15 +70,16 @@ Differentiation leads to the following revised effective stiffness $\bhat{K}_{n+
 \bhat{K}_{n+1}=\bbar{K}_{n+1}+\dfrac{m\Delta{}t}{2+s\Delta{}t}\mb{T}\ddfrac{\bv_{n+1}}{\bu_{n+1}}.
 \end{gather}
 Typically, $\ddfrac{\bv}{\bu}$ reduces to a scalar constant (multiplied by an identity matrix), for example, in the Newmark method, it is $\dfrac{\gamma}{\beta\Delta{}t}$.
-\begin{Objective}
-\paragraph{Remark}
+%\begin{Objective}
+\begin{rmk}
 If other direct time integration methods are used for \eqsref{eq:eom}, other methods can be applied to \eqsref{eq:single_conv_ode}. The following are some examples.
 \begin{enumerate}
 \item For the Bathe two-step method \citep{Noh2019}, the TR-BDF2 method \citep{Bank1985} can be used.
 \item For the OALTS method \citep{Zhang2021}, the BDF2 method can be used.
 \item For the generalised-$\alpha$ method \citep{Chung1993} and the GSSSS method \citep{Zhou2003}, the variable step size BDF2 method can be used.
 \end{enumerate}
-\end{Objective}
+\end{rmk}
+%\end{Objective}
 
 By introducing the revised resistance $\bhat{y}_{n+1}$ as
 \begin{gather}\label{eq:revised_y}
@@ -164,7 +165,7 @@ the time and space complexity is $\mathcal{O}\left(ij_\text{max}n\right)$.
 Sum of exponentials is able to provide a wide coverage of various kernel functions \citep[c.f.,][]{Adhikari2003}, as a decent amount of kernels can be equivalently expressed as sums of exponentials.
 
 It is clear that the Fourier transform (exponential form) allows one to express arbitrary smooth function $g\left(t\right)$ as an infinite sum of exponentials, even if $g\left(t\right)$ is non-periodic. It is possible to approximate $g\left(t\right)$ if a fast converging exponential series can be found.
-One can use Prony's method \citep[see, e.g.,][]{Hamming1987} and its derivations \citep{Hokanson2013} to find a proper approximation. However, it tends to have a slow convergence \citep{Trudnowski1999} which inevitably leads to a large number of exponentials that would impair computational efficiency. By further adopting model reduction, \citet{Gao2022} presented a method, named as VPMR, with controllable magnitudes of exponents and fast convergence, to compute the desired approximation, formally,
+One can use Prony's method \citep[see, e.g.,][]{Hamming1987} and its derivations \citep{Hokanson2013} to find a proper approximation. However, it tends to have a slow convergence \citep{Trudnowski1999} which inevitably leads to a large number of exponentials that would impair computational efficiency. Alternatively, functions can be approximated by sums of exponentials or Gaussians, for further discussions on this topic, one can refer to the review by \citet{Beylkin2010}. By further adopting model reduction, \citet{Gao2022} presented a method, named as VPMR, with controllable magnitudes of exponents and fast convergence, to compute the desired approximation, formally,
 \begin{gather}
 \max_{t\in{}I}{\abs{g\left(t\right)-\sum_jm_j\exp\left(-s_jt\right)}}<\epsilon,
 \end{gather}
