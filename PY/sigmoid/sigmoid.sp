@@ -71,7 +71,7 @@ initial acceleration 0.66666666666666666666666666 1 3
 hdf5recorder 1 Node U1 2 3 4
 
 step dynamic 1 20
-set ini_step_size 1E-1
+set ini_step_size 2E-1
 set fixed_step_size 1
 
 converger AbsIncreDisp 1 1E-14 10 1
@@ -80,6 +80,6 @@ analyze
 
 save recorder 1
 
-terminal ren R1-U1.h5 R1-U1-0.1.h5
+terminal ren R1-U1.h5 R1-U1-0.2.h5
 
 exit

@@ -27,13 +27,15 @@ def numerical(pick):
 def sigmoid():
     results = {
         '0.01': numerical(0.01),
-        '0.1': numerical(0.1)
+        '0.1': numerical(0.1),
+        '0.2': numerical(0.2)
     }
 
     fig = plt.figure(figsize=(6, 2))
 
     ax1 = plt.gca()
 
+    add_plot(ax1, results, '0.2', 1.4)
     add_plot(ax1, results, '0.1', 1.4)
     add_plot(ax1, results, '0.01', 1.4)
 
@@ -42,7 +44,7 @@ def sigmoid():
     plt.grid(which='both', axis='both', linestyle='--', linewidth=.2)
     plt.xlim(0, 20)
 
-    plt.legend(handlelength=4, ncols=2)
+    plt.legend(handlelength=4, ncols=3)
 
     fig.tight_layout(pad=.1)
     plt.show()
