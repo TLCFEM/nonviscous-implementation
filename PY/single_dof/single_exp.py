@@ -3,6 +3,7 @@ import matplotlib
 import numpy as np
 from matplotlib import pyplot as plt
 from numpy import exp
+from scipy.stats import linregress
 
 from PY.Utility import LS, Response
 
@@ -25,7 +26,7 @@ def system(m, c, k, nu):
     coef[1, 2] = -r2 - r1
     coef[2, 2] = r2 * r1
 
-    w = np.linalg.solve(coef, np.array([u0, u0 * nu + v0, c * nu / m * u0]))
+    w = np.linalg.solve(coef, np.array([u0, u0 * nu + v0, nu * v0 + c * nu / m * u0]))
 
     def _f(_t):
         return np.dot(w, exp(roots * _t)).real
@@ -95,8 +96,6 @@ if __name__ == '__main__':
     for key, value in results.items():
         error_x.append(float(key))
         error_y.append(np.max(np.abs(value.error)))
-
-    from scipy.stats import linregress
 
     result = linregress(np.log(error_x), np.log(error_y))
     plt.loglog(error_x, np.exp(result[1]) * np.power(error_x, result[0]), 'r--',
