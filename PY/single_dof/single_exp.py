@@ -72,12 +72,12 @@ if __name__ == '__main__':
 
     sdof = analytical([1, 2, 100, 1])
     results['0.0001'] = numerical(sdof, 0.0001)
+    results['0.0002'] = numerical(sdof, 0.0002)
     results['0.0005'] = numerical(sdof, 0.0005)
     results['0.001'] = numerical(sdof, 0.001)
     results['0.002'] = numerical(sdof, 0.002)
     results['0.005'] = numerical(sdof, 0.005)
     results['0.01'] = numerical(sdof, 0.01)
-    results['0.02'] = numerical(sdof, 0.02)
 
     for key, value in results.items():
         plt.plot(value.time, value.displacement, label=f'$\\Delta{{}}t=${float(key):1.0E}', linestyle=next(LS),

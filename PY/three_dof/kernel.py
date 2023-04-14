@@ -277,7 +277,7 @@ if __name__ == '__main__':
     plt.setp(axs, xlim=(0, 3))
     plt.tight_layout(pad=.05)
     plt.show()
-    fig.savefig('../kernel.pdf')
+    fig.savefig('../kernel_gauss.pdf')
 
     fig, axs = plt.subplots(1, 1, figsize=(6, 2))
     x, y, ref = plotter(kernel3, kernel3_ana)
@@ -285,6 +285,7 @@ if __name__ == '__main__':
     axs.plot(x, ref, 'b-', label='sigmoid kernel', linewidth=2)
     axs.plot(x, y.real, 'r', linestyle='dashdot', label='approximation', linewidth=3)
     axs.legend(handlelength=6)
+    axs.set_xlabel('time $t$ (s)')
 
     ax2 = axs.twinx()
     ax2.plot(x, np.abs(ref - y), 'g--', label='absolute error', linewidth=1)
@@ -294,9 +295,9 @@ if __name__ == '__main__':
 
     ax2.set_ylabel('absolute error')
 
-    axs.set_ylabel('sigmoid kernel$')
+    axs.set_ylabel('sigmoid kernel')
 
     plt.setp(axs, xlim=(0, 3))
     plt.tight_layout(pad=.05)
     plt.show()
-    fig.savefig('../kernel2.pdf')
+    fig.savefig('../kernel_sigmoid.pdf')
