@@ -208,12 +208,12 @@ def split(r: str):
 def print_table(m, s):
     print(r'\begin{tabular}{r|r|r|r}')
     print(r'\toprule')
-    print(r'$\Re(m)$ & $\Im(m)$ & $\Re(s)$ & $\Im(s)$ \\')
+    print(r'$\Re(m_l)$ & $\Im(m_l)$ & $\Re(s_l)$ & $\Im(s_l)$ \\')
     print(r'\midrule')
 
     for i, j in zip(m, s):
-        print(f'\\num{{{i.real:.15e}}}&\\num{{{i.imag:.15e}}}&', end='')
-        print(f'\\num{{{j.real:.15e}}}&\\num{{{j.imag:.15e}}}\\\\')
+        print(f'\\num{{{i.real:.16e}}}&\\num{{{i.imag:.16e}}}&', end='')
+        print(f'\\num{{{j.real:.16e}}}&\\num{{{j.imag:.16e}}}\\\\')
 
     print(r'\bottomrule')
     print(r'\end{tabular}')
@@ -221,7 +221,7 @@ def print_table(m, s):
     print('================================================================================================')
 
     for i, j in zip(m, s):
-        print(f'{i.real: .15e} {i.imag: .15e} {j.real: .15e} {j.imag: .15e} \\')
+        print(f'{i.real: .16e} {i.imag: .16e} {j.real: .16e} {j.imag: .16e} \\')
 
     print('================================================================================================')
 
@@ -272,7 +272,7 @@ if __name__ == '__main__':
 
     axs[0].set_ylabel('kernel $g_1(t)$')
     axs[1].set_ylabel('kernel $g_2(t)$')
-    axs[1].set_xlabel('time $t$ (s)')
+    axs[1].set_xlabel('time (s)')
 
     plt.setp(axs, xlim=(0, 3))
     plt.tight_layout(pad=.05)
@@ -285,7 +285,7 @@ if __name__ == '__main__':
     axs.plot(x, ref, 'b-', label='sigmoid kernel', linewidth=2)
     axs.plot(x, y.real, 'r', linestyle='dashdot', label='approximation', linewidth=3)
     axs.legend(handlelength=6)
-    axs.set_xlabel('time $t$ (s)')
+    axs.set_xlabel('time (s)')
 
     ax2 = axs.twinx()
     ax2.plot(x, np.abs(ref - y), 'g--', label='absolute error', linewidth=1)

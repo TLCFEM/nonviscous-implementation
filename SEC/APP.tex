@@ -20,9 +20,9 @@ s^3
 +\dfrac{k\mu}{m}\right)U
 =
 u_0s^2
-+\left(u_0\mu+\dot{u}_0\right)s
-+\mu\dot{u}_0
-+\dfrac{c\mu{}}{m}u_0.
++\left(\mu{}u_0+\dot{u}_0\right)s
++\dfrac{c\mu{}}{m}u_0
++\mu\dot{u}_0.
 \end{gather}
 Assuming the three roots of the characteristic equation are $r_1$, $r_2$ and $r_3$, and $U$ can be expressed as
 \begin{gather}
@@ -40,13 +40,15 @@ P_1\\P_2\\P_3
 \end{bmatrix}
 =
 \begin{bmatrix}
-u_0\\u_0\mu+\dot{u}_0\\\mu\dot{u}_0
-+\dfrac{c\mu{}}{m}u_0
+u_0\\
+\mu{}u_0+\dot{u}_0\\
+\dfrac{c\mu{}}{m}u_0
++\mu\dot{u}_0
 \end{bmatrix}.
 \end{gather}
 After solving $P_i$, transforming $U$ back to the time domain gives the solution
 \begin{gather}
-u(t)=\sum_{i=1}^3P_i\exp\left(r_1t\right).
+u(t)=\sum_{i=1}^3P_i\exp\left(r_it\right).
 \end{gather}
 \section{VPMR Approximation of Gaussian Kernels}\label{sec:vpmr}
 For kernel
