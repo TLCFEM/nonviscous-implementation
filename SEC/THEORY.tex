@@ -171,7 +171,7 @@ One can use Prony's method \citep[see, e.g.,][]{Hamming1987} and its derivations
 \end{gather}
 where $I$ is a finite interval that could be an arbitrary subset of $\mathbb{R}^+$, $\epsilon$ is the error tolerance.
 
-By using VPMR, it is feasible to convert nonviscous damping with arbitrary (in terms of both number and form) kernels applied to the dynamic system into the form of \eqsref{eq:composition}. Noting that $\epsilon$ is a user input, by assigning a tolerance close to (or less than) machine epsilon --- around \num{e-16} for double precision floating point representation, an accurate equivalence of arbitrary kernel function can be obtained for nonviscous damping computation. In practice, such a tolerance only needs to be smaller than the analysis tolerance.
+By using VPMR, it is feasible to convert nonviscous damping with arbitrary (in terms of both number and form) kernels applied to the dynamic system into the form of \eqsref{eq:composition}. Noting that $\epsilon$ is a user input, by assigning a tolerance close to (or less than) machine epsilon --- around \num{e-16} for double precision floating point representation, an accurate equivalence of arbitrary kernel function can be obtained for nonviscous damping computation. In practice, such a tolerance only needs to be smaller than the time history analysis tolerance.
 
 It is worth emphasising that converting the desired kernel functions to sums of exponentials a) is independent of the dynamic system of interest and b) is performed offline, viz., ahead of time. Combining with \algoref{algo:single_model}, the following procedure can be employed to model nonviscously damped systems with arbitrary kernels.
 \begin{Objective}
