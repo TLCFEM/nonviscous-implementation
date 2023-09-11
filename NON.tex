@@ -69,7 +69,7 @@
 \linenumbers
 \begin{abstract}
 \begin{linenumbers}
-In this work, a fast algorithm to evaluate the dynamic response of nonviscously damped systems with arbitrary distributions of damping characterised by arbitrary kernel functions (both number and form) is proposed. The proposed algorithm requires mere level 2 BLAS operations. It can be integrated into existing analysis tools with various time integration methods in forms of either element-based dashpots or global damping model. Compared to other existing methods, the proposed algorithm shows superior accuracy while the corresponding computational cost is low.
+In this work, a fast algorithm to evaluate the dynamic response of nonviscously damped systems with arbitrary distributions of damping characterised by arbitrary kernel functions (both number and form) is proposed. The proposed algorithm requires mere level 2 BLAS operations. It can be integrated into existing analysis tools with various time integration methods in forms of either element-based dashpots or global damping model. Compared to other existing methods, the proposed algorithm does not explicitly evaluate the convolution integral and thus does not require the storage of the whole velocity history. It shows superior accuracy while the corresponding computational cost is low.
 \end{linenumbers}
 \end{abstract}
 \begin{keyword}
