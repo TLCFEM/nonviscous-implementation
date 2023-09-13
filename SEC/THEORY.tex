@@ -11,7 +11,7 @@ Note here, $\bw$ can be either the exact velocity vector $\bv$, or a vector that
 \begin{gather}\label{eq:wv}
 \bw=\mb{T}\bv,
 \end{gather}
-where $\mb{T}$ picks the participating DoFs, and can be, for example, a square diagonal matrix with its diagonal entries being either one or zero. \eqsref{eq:wv} is beneficial when it comes to compositing flexible damping based on different node/element based rules. It will be discussed later in this work.
+where $\mb{T}$ picks the participating DoFs, and can be, for example, a square diagonal matrix with its diagonal entries being either one or zero. \eqsref{eq:wv} is beneficial when it comes to compositing flexible damping based on different node/element-based rules. It will be discussed later in this work.
 \subsection{A Single Exponential Kernel}
 We start with the scalar-valued exponential kernel function
 \begin{gather}
@@ -38,7 +38,7 @@ Instead of directly integrating \eqsref{eq:single_conv} using higher-order metho
 \end{gather}
 in which the first equation is a first-order ODE while the second equation is a second-order ODE.
 
-Given that popular time integration methods are of second-order accuracy, in the context of a discretised iterative solving schema, \eqsref{eq:single_conv_ode} can be rewritten as follows using the trapezoidal rule, which is second-order accurate,
+Given that popular time integration methods are of second-order accuracy, in the context of a discretised iterative solving schema, \eqsref{eq:single_conv_ode} can be rewritten as follows using the (implicit) trapezoidal rule, which is second-order accurate and A-stable,
 \begin{gather}
 \bbf_{n+1}=\bbf_n+\dfrac{\Delta{}t}{2}\left(\dot{\bbf}_n+\dot{\bbf}_{n+1}\right).
 \end{gather}
@@ -64,7 +64,7 @@ The viscous damping matrix $\mb{C}$ is included here for generality. It may not 
 \begin{gather}
 \bhat{C}_{n+1}=\mb{C}_{n+1}+\dfrac{m\Delta{}t}{2+s\Delta{}t}\mb{T}.
 \end{gather}
-The extra term $\dfrac{m\Delta{}t}{2+s\Delta{}t}\mb{T}$ involves only scalar-matrix product, and $\mb{T}$ is often sparse or even diagonal (using a node based distribution rule). It does not alter any other parts of the established solving algorithm (for viscous systems).
+The extra term $\dfrac{m\Delta{}t}{2+s\Delta{}t}\mb{T}$ involves only scalar-matrix product, and $\mb{T}$ is often sparse or even diagonal (using a node-based distribution rule). It does not alter any other parts of the established solving algorithm (for viscous systems).
 
 By introducing the revised resistance $\bhat{y}_{n+1}$ as
 \begin{gather}\label{eq:revised_y}
@@ -76,7 +76,9 @@ the linearised system to be solved is
 \end{gather}
 \begin{Objective}
 %\begin{rmk}
-If other direct time integration methods are used for \eqsref{eq:eom}, other methods can be applied to \eqsref{eq:single_conv_ode}. The following are some examples.
+Since the implicit trapezoidal rule is A-stable, the overall result is stable as long as the adopted Newmark method is stable, namely, $\gamma\geqslant0.5$ and $\beta\geqslant0.25\left(\gamma+0.5\right)^2$. Accounting for the fact that the Newmark method can be second-order accurate ($\gamma=0.5$ and $\beta=0.25$), the implicit trapezoidal rule is adopted here to improve the overall accuracy.
+
+If other direct time integration methods are used for \eqsref{eq:eom}, other methods can be applied to discretise \eqsref{eq:single_conv_ode}. The following are some examples.
 \begin{enumerate}
 \item For the Bathe two-step method \citep{Noh2019}, the TR-BDF2 method \citep{Bank1985} can be used.
 \item For the OALTS method \citep{Zhang2021}, the BDF2 method can be used.
@@ -88,10 +90,10 @@ If other direct time integration methods are used for \eqsref{eq:eom}, other met
 Given that the discretisation \eqsref{eq:discretised_c} does not introduce additional assumptions regarding the system itself, \eqsref{eq:revised_system} is universal and can be applied to both elastic and inelastic systems. In the context of inelastic systems, the local iteration body is summarised in \algoref{algo:single_model} with subscript $\left(\cdot\right)_{n+1}$ dropped for brevity.
 The steps with a leading \faMicrochip~symbol augment global effective stiffness and resistance to obtain $\bhat{K}$ and $\bhat{y}$. Those are additional steps that need to be computed compared to a conventional algorithm for viscously damped systems. Once convergence is achieved, it is necessary to store the history of nonviscous damping force $\bbf_n\leftarrow\bbf$.
 \begin{breakablealgorithm}
-\setstretch{1.8}
+\setstretch{1.6}
 \caption{iteration body of solving nonviscously damped system with one exponential kernel}\label{algo:single_model}
 \begin{algorithmic}
-\State \textbf{*Scheme: Newmark + Trapezoidal}
+\State \textbf{*Schema: Newmark + Trapezoidal}
 \State \textbf{Input}: $\bbar{K}$, $\bu$, $\bv$, $\mb{y}$, $\mb{p}$ (quantities obtained via conventional manner as if there is no nonviscous damping) and $\bbf_n$, $m$, $s$
 \State \textbf{Output}: $\bu$
 \State compute $\bw$ from $\bv$
@@ -107,7 +109,7 @@ Upon careful comparison, it becomes evident that the algorithm presented bears r
 
 Unlike other algorithms, such as the one by \citet{Cortes2009}, \algoref{algo:single_model} does not impose additional requirements on the time integration method used. Some existing state space methods manage to eliminate the convolution integral term from the \textbf{continuous} version of \eqsref{eq:eom} \citep[see][]{Wagner2003,Wu2019}, which, in the writers' opinion, overcomplicates the solution procedure in the context of \textit{numerical} analysis, given that the analytical first-order ODE in the state space would still need to be discretised \citep{Adhikari2004} and numerically integrated for general systems. Nonetheless, whenever analytical solutions are sought, those methods may provide extra merits that direct time integration methods do not offer.
 \subsection{Complexity Analysis}
-If $\mb{T}$ is a diagonal matrix, implying a node based damping distribution, \eqsref{eq:revised_k} requires $n$ additional floating point number arithmetic while \eqsref{eq:revised_y} requires $3n$, with $n$ denoting the size of the system. The total number of additional floating point number multiplications is $4n$, that is a time complexity of $\mathcal{O}\left(n\right)$. If an element based damping distribution rule is used, $\mb{T}$ would have a structure similar to that of $\mb{K}$. Assuming $\mb{T}$ contains $m$ nonzero scalars, the total number of additional floating point number multiplications is $3n+m$.
+If $\mb{T}$ is a diagonal matrix, implying a node-based damping distribution, \eqsref{eq:revised_k} requires $n$ additional floating point number arithmetic while \eqsref{eq:revised_y} requires $3n$, with $n$ denoting the size of the system. The total number of additional floating point number multiplications is $4n$, that is a time complexity of $\mathcal{O}\left(n\right)$. If an element-based damping distribution rule is used, $\mb{T}$ would have a structure similar to that of $\mb{K}$. Assuming $\mb{T}$ contains $m$ nonzero scalars, the total number of additional floating point number multiplications is $3n+m$.
 
 \algoref{algo:single_model} requires no memory reallocation, the additional storage needed is for the nonviscous damping forces $\bbf_n$, implying a space complexity of $n$. The matrix $\mb{T}$ may also need to be stored depending on the specific form it has.
 %\subsection{Stability Analysis}
@@ -210,10 +212,10 @@ where $I$ is a finite interval that could be an arbitrary subset of $\mathbb{R}^
 By using VPMR, it is feasible to convert nonviscous damping with arbitrary (in terms of both number and form) kernels applied to the dynamic system into the form of \eqsref{eq:composition}. Noting that $\epsilon$ is a user input, by assigning a tolerance close to (or less than) machine epsilon --- around \num{e-16} for double precision floating point representation, an accurate equivalence of arbitrary kernel function can be obtained for nonviscous damping computation. In practice, such a tolerance only needs to be smaller than the time history analysis tolerance.
 
 \begin{breakablealgorithm}
-\setstretch{1.8}
+\setstretch{1.6}
 \caption{iteration body of solving nonviscously damped system with arbitrary kernels}\label{algo:vpmr}
 \begin{algorithmic}
-\State \textbf{*Scheme: Newmark + Trapezoidal}
+\State \textbf{*Schema: Newmark + Trapezoidal}
 \State \textbf{Input}: $\bbar{K}$, $\bu$, $\bv$, $\mb{y}$, $\mb{p}$ (quantities obtained via conventional manner as if there is no nonviscous damping) and $\bbf_{l,n}^k$, $m_l^k$, $s_l^k$
 \State \textbf{Output}: $\bu$
 \State obtain $\bw^k$ from $\bv$ based on prescribed rules
@@ -237,4 +239,4 @@ It is worth emphasising that converting the desired kernel functions to sums of 
 \item With parameters $m_l^k$ and $s_l^k$ obtained from the VPMR algorithm, use \algoref{algo:vpmr} to solve the dynamic system.
 \end{enumerate}
 \end{Objective}
-It shall be pointed out that in this work, the trapezoidal rule combined with the Newmark method is employed. As mentioned before, different combinations, referred here as schemes, can be used as alternatives. The specific iterative algorithms need to be derived separately. The expressions involved in \algoref{algo:vpmr}, as well as \algoref{algo:single_model}, are only applicable to the Newmark method with the trapezoidal rule.
+It shall be pointed out that in this work, the trapezoidal rule combined with the Newmark method is employed. As mentioned before, different combinations, referred here as schemas, can be used as alternatives. The specific iterative algorithms need to be derived separately. The expressions involved in \algoref{algo:vpmr}, as well as \algoref{algo:single_model}, are only applicable to the Newmark method with the trapezoidal rule.

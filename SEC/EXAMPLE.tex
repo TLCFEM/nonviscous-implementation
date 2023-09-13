@@ -88,6 +88,7 @@ g_1\left(0\right)=600,\qquad
 g_1\left(0.01\right)\approx\num{0.027},\qquad\int_{0}^{0.01}g_1~\md{t}\approx0.599973.
 \end{gather}
 Such a rapidly changing function within $t\in[0,0.01]$ can hardly be accurately integrated by solely using values at two ends.
+As the adopted trapezoidal rule is A-stable, it is free from similar issues. Other recommended methods (BDF2 family) are also second-order accurate and A-stable.
 \subsection{Three DOF System With Two Gaussian Kernels}
 In the previous example, instead of two exponential kernels, two Gaussian kernels
 \begin{gather}
