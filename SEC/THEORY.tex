@@ -48,7 +48,7 @@ Expanding and rearranging lead to
 \end{gather}
 in which subscripts $\left(\cdot\right)_{n+1}$ and $\left(\cdot\right)_n$ denote the corresponding quantity at $t_n$ and $t_{n+1}=t_n+\Delta{}t$.
 
-Assuming the Newmark method is used for \eqsref{eq:eom}, viz., \eqsref{eq:eom} is satisfied at $t_{n+1}$, then, accounting for \eqsref{eq:discretised_c}, \eqsref{eq:eom} is
+Assuming \eqsref{eq:eom} is satisfied at $t_{n+1}$, then, accounting for \eqsref{eq:discretised_c}, \eqsref{eq:eom} is
 \begin{gather}\label{eq:residual}
 \mb{y}_{n+1}+\dfrac{2-s\Delta{}t}{2+s\Delta{}t}\bbf_n+\dfrac{m\Delta{}t}{2+s\Delta{}t}\bw_n+\dfrac{m\Delta{}t}{2+s\Delta{}t}\bw_{n+1}=\mb{p}_{n+1}.
 \end{gather}
@@ -56,7 +56,7 @@ Differentiation leads to the following revised effective stiffness $\bhat{K}_{n+
 \begin{gather}\label{eq:revised_k}
 \bhat{K}_{n+1}=\bbar{K}_{n+1}+\dfrac{m\Delta{}t}{2+s\Delta{}t}\mb{T}\ddfrac{\bv_{n+1}}{\bu_{n+1}},
 \end{gather}
-in which $\bbar{K}_{n+1}$ denotes the conventional effective stiffness, that can be expressed as
+in which $\bbar{K}_{n+1}$ denotes the conventional effective stiffness that can be expressed as
 \begin{gather}
 \bbar{K}_{n+1}=\ddfrac{\mb{y}_{n+1}}{\bu_{n+1}}=\mb{K}_{n+1}+\mb{C}_{n+1}\ddfrac{\bv_{n+1}}{\bu_{n+1}}+\mb{M}_{n+1}\ddfrac{\ba_{n+1}}{\bu_{n+1}}.
 \end{gather}
@@ -76,9 +76,9 @@ the linearised system to be solved is
 \end{gather}
 \begin{Objective}
 %\begin{rmk}
-Since the implicit trapezoidal rule is A-stable, the overall result is stable as long as the adopted Newmark method is stable, namely, $\gamma\geqslant0.5$ and $\beta\geqslant0.25\left(\gamma+0.5\right)^2$. Accounting for the fact that the Newmark method can be second-order accurate ($\gamma=0.5$ and $\beta=0.25$), the implicit trapezoidal rule is adopted here to improve the overall accuracy.
+The implicit trapezoidal rule is second-order accurate. It is adopted to improve the overall accuracy accounting for the fact that most time integration methods are second-order accurate. Since the implicit trapezoidal rule is A-stable, the overall result is stable as long as the adopted time integration method is stable.
 
-If other direct time integration methods are used for \eqsref{eq:eom}, other methods can be applied to discretise \eqsref{eq:single_conv_ode}. The following are some examples.
+\eqsref{eq:discretised_c} is expressed in a form that is compatible with single-step algorithms. It thus can be used with other single-step time integration methods. Nevertheless, apart from the implicit trapezoidal rule, other methods can be applied to discretise \eqsref{eq:single_conv_ode}. The following are some examples.
 \begin{enumerate}
 \item For the Bathe two-step method \citep{Noh2019}, the TR-BDF2 method \citep{Bank1985} can be used.
 \item For the OALTS method \citep{Zhang2021}, the BDF2 method can be used.
