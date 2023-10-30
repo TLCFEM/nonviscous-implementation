@@ -1,5 +1,5 @@
 \section{An Efficient Algorithm for Systems With A Single Exponential Kernel}\label{sec:single}
-The present section introduces an enhancement of the algorithm proposed by \citet{Adhikari2004} through optimisation. The improvement is accomplished by reformulating the algorithm into a form that enables the integration of arbitrary kernel functions.
+The present section introduces an enhancement of the algorithm proposed by \citet{Adhikari2004} through optimisation. The improvement is accomplished by reformulating the algorithm into a form that can be extended to account for arbitrary kernel functions.
 \subsection{Nonviscously Damped MDOF System}
 Without loss of generality, consider the equation of motion of a nonviscously damped inelastic multi-degree-of-freedom (MDOF) system,
 \begin{gather}\label{eq:eom}
@@ -11,7 +11,7 @@ Note here, $\bw$ can be either the exact velocity vector $\bv$, or a vector that
 \begin{gather}\label{eq:wv}
 \bw=\mb{T}\bv,
 \end{gather}
-where $\mb{T}$ picks the participating DoFs, and can be, for example, a square diagonal matrix with its diagonal entries being either one or zero. \eqsref{eq:wv} is beneficial when it comes to compositing flexible damping based on different node/element-based rules. It will be discussed later in this work.
+where $\mb{T}$ picks the participating DoFs, and can be, for example, a square diagonal matrix with its diagonal entries being either one or zero. If $\mb{T}$ is the identity matrix, then $\bw=\bv$, the convolution is expressed in the conventional form. \eqsref{eq:wv} is beneficial when it comes to compositing flexible damping based on different node/element-based rules. It will be discussed later in this work.
 \subsection{A Single Exponential Kernel}
 We start with the scalar-valued exponential kernel function
 \begin{gather}
@@ -36,7 +36,7 @@ Instead of directly integrating \eqsref{eq:single_conv} using higher-order metho
 \mb{y}+\bbf=\mb{p},
 \end{array}\right.
 \end{gather}
-in which the first equation is a first-order ODE while the second equation is a second-order ODE.
+in which the first equation is a first-order ODE (of $\bbf$) while the second equation is a second-order ODE (of $\bu$).
 
 Given that popular time integration methods are of second-order accuracy, in the context of a discretised iterative solving schema, \eqsref{eq:single_conv_ode} can be rewritten as follows using the (implicit) trapezoidal rule, which is second-order accurate and A-stable,
 \begin{gather}
@@ -46,9 +46,9 @@ Expanding and rearranging lead to
 \begin{gather}\label{eq:discretised_c}
 \bbf_{n+1}=\dfrac{2-s\Delta{}t}{2+s\Delta{}t}\bbf_n+\dfrac{m\Delta{}t}{2+s\Delta{}t}\bw_n+\dfrac{m\Delta{}t}{2+s\Delta{}t}\bw_{n+1},
 \end{gather}
-in which subscripts $\left(\cdot\right)_{n+1}$ and $\left(\cdot\right)_n$ denote the corresponding quantity at $t_n$ and $t_{n+1}=t_n+\Delta{}t$.
+in which subscripts $\left(\cdot\right)_n$ and $\left(\cdot\right)_{n+1}$ denote the corresponding quantity at $t_n$ and $t_{n+1}=t_n+\Delta{}t$.
 
-Assuming \eqsref{eq:eom} is satisfied at $t_{n+1}$, then, accounting for \eqsref{eq:discretised_c}, \eqsref{eq:eom} is
+Assuming the equation of motion \eqsref{eq:eom} is satisfied at $t_{n+1}$, then, accounting for \eqsref{eq:discretised_c}, \eqsref{eq:eom} is
 \begin{gather}\label{eq:residual}
 \mb{y}_{n+1}+\dfrac{2-s\Delta{}t}{2+s\Delta{}t}\bbf_n+\dfrac{m\Delta{}t}{2+s\Delta{}t}\bw_n+\dfrac{m\Delta{}t}{2+s\Delta{}t}\bw_{n+1}=\mb{p}_{n+1}.
 \end{gather}
