@@ -1,22 +1,33 @@
-\section{Numerical Examples}
+\section{Numerical Examples}\label{sec:example}
 In the following examples, units are omitted for brevity.
 The Newmark (constant acceleration) method is used for time integration unless stated otherwise.
 \subsection{SDOF System With Single Exponential}
 We start with the validation of \algoref{algo:single_model}. To this end, consider the free vibration of a SDOF system with one exponential kernel such that the EOM can be expressed as
 \begin{gather}
-m\ddot{u}\left(t\right)+\int_0^tc\mu\exp\left(-\mu\left(t-\tau\right)\right)\dot{u}\left(\tau\right)\md{\tau}+ku\left(t\right)=0.
+m\ddot{u}\left(t\right)+\int_0^tc\mu\exp\left(-\mu\left(t-\tau\right)\right)\dot{u}\left(\tau\right)\md{\tau}+ku\left(t\right)=p\left(t\right).
 \end{gather}
 The parameters are set to $m=1$, $c=2$, $\mu=1$, $k=100$.
-The initial conditions are $u\left(0\right)=1$, $\dot{u}\left(0\right)=0$ and $\ddot{u}\left(0\right)=-100$.
-The closed form solution can be found in \secref{sec:analytical_sdof}.
+The initial conditions are $u\left(0\right)=1$, $\dot{u}\left(0\right)=0$ and $\ddot{u}\left(0\right)=-100$\replace{.}{for free vibration, namely, $p\left(t\right)=0$.} The \add{corresponding} closed form solution can be \replace{found}{derived, the procedure is presented} in \secref{sec:analytical_sdof}.
 The displacement history and the corresponding error convergence are shown in \figref{fig:sdof}.
 
 The maximum of the difference between numerical and analytical solutions is taken as the absolute error $\epsilon$. It is evident that \eqsref{eq:discretised_c} retains the second-order accuracy of the Newmark method.
 \begin{figure}[H]
 \centering
 \includegraphics{PY/single_exp}
-\caption{displacement history and error analysis of SDOF oscillator with one exponential kernel}\label{fig:sdof}
+\caption{displacement history and error analysis of SDOF oscillator with one exponential kernel (free vibration)}\label{fig:sdof}
 \end{figure}
+
+\add{For forced vibration, the following initial conditions are chosen: $u\left(0\right)=\dot{u}\left(0\right)=\ddot{u}\left(0\right)=0$. The external force is defined as a sinusoid wave, namely,
+\begin{gather}
+p\left(t\right)=100\sin\left(0.4\pi{}t\right).
+\end{gather}
+The corresponding analytical solution can be sought by using the same technique as shown in \secref{sec:analytical_sdof} but with a more cumbersome algebraic operations. The displacement history and the corresponding convergence performance are shown in \figref{fig:sdof_forced}. Similar to the free vibration case, the second-order accuracy is retained.
+\begin{figure}[H]
+\centering
+\includegraphics{PY/single_forced}
+\caption{displacement history and error analysis of SDOF oscillator with one exponential kernel (forced vibration)}\label{fig:sdof_forced}
+\end{figure}
+}
 \subsection{Three DOF System With Two Exponentials}
 A three-degree-of-freedom system shown in \figref{fig:three_dof} is adopted to demonstrate the applicability of the proposed algorithm in MDOF systems. This example is also adopted by some of aforementioned work \cite[see, e.g.,][]{Adhikari2004,Cortes2009,Shen2019,Liu2023}.
 \begin{figure}[H]
@@ -95,7 +106,7 @@ In the previous example, instead of two exponential kernels, two Gaussian kernel
 g_1=1.2\sqrt{\dfrac{1}{\pi}}\exp\left(-t^2\right),\qquad
 g_2=0.4\sqrt{\dfrac{5}{\pi}}\exp\left(-5t^2\right),
 \end{gather}
-can be used. The sum-of-exponential approximations given by the VPMR algorithm are shown in \figref{fig:vpmr}. With a tolerance around \num{e-12}, only \num{13} exponentials are required. The corresponding $m_l$ and $s_l$ parameters are given in \secref{sec:vpmr}.
+can be used. The sum-of-exponential approximations given by the VPMR algorithm are shown in \figref{fig:vpmr}. With a \add{chosen} tolerance around \num{e-12}, only \num{13} exponentials are required. The corresponding $m_l$ and $s_l$ parameters are given in \secref{sec:vpmr}.
 \begin{figure}[H]
 \centering
 \includegraphics{PY/kernel_gauss}
@@ -125,7 +136,7 @@ g_1=g_2=\left\{
 \right.
 \end{gather}
 
-The VPMR approximation is given in \figref{fig:sigmoid_kernel} while the displacement histories with different step sizes are given in \figref{fig:three_sigmoid}. Since no analytical solution is available, no comparisons would be given. Nevertheless, one could use the result in \figref{fig:three_sigmoid} as a reference for future comparisons.
+The VPMR approximation \add{(with a chosen tolerance around \num{e-4})} is given in \figref{fig:sigmoid_kernel} while the displacement histories with different step sizes are given in \figref{fig:three_sigmoid}. Since no analytical solution is available, no comparisons would be given. Nevertheless, one could use the result in \figref{fig:three_sigmoid} as a reference for future comparisons.
 \begin{figure}[H]
 \centering
 \includegraphics{PY/kernel_sigmoid}
