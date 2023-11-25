@@ -15,6 +15,8 @@ jobs:
           export PYTHONPATH=$PWD
           cd PY/single_dof
           python single_exp.py
+          cd ../single_forced
+          python single_forced.py
           cd ../three_dof
           python three_dof.py
           python three_gauss.py
