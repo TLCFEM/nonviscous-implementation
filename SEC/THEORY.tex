@@ -207,7 +207,10 @@ the time and space complexity is $\mathcal{O}\left(ij_\text{max}n\right)$.
 Sum of exponentials is able to provide a wide coverage of various kernel functions \citep[c.f.,][]{Adhikari2003}, as a decent amount of kernels can be equivalently expressed as sums of exponentials.
 
 It is clear that the Fourier transform (exponential form) allows one to express arbitrary smooth function $g\left(t\right)$ as an infinite sum of exponentials, even if $g\left(t\right)$ is non-periodic. It is possible to approximate $g\left(t\right)$ if a fast converging exponential series can be found.
-One can use Prony's method \citep[see, e.g.,][]{Hamming1987} and its derivations \citep{Hokanson2013} to find a proper approximation. \add{\citet{Du2022} adopted a similar technique, via which the convolution term is approximated by an IIR filter. }However, it tends to have a slow convergence \citep{Trudnowski1999} which inevitably leads to a large number of exponentials that would impair computational efficiency. Alternatively, functions can be approximated by sums of exponentials or Gaussians, for further discussions on this topic, one can refer to the review by \citet{Beylkin2010}. By further adopting model reduction, \citet{Gao2022} presented a method, named as VPMR, with controllable magnitudes of exponents and fast convergence, to compute the desired approximation, formally,
+One can use Prony's method \citep[see, e.g.,][]{Hamming1987} and its derivations \citep{Hokanson2013} to find a proper approximation.
+\add{\citet{Du2022} adopted a similar technique, via which the convolution term is approximated by an IIR filter.}
+However, it tends to have a slow convergence \citep{Trudnowski1999} which inevitably leads to a large number of exponentials that would impair computational efficiency.
+Alternatively, functions can be approximated by sums of exponentials or Gaussians, for further discussions on this topic, one can refer to the review by \citet{Beylkin2010}. By further adopting model reduction, \citet{Gao2022} presented a method, named as VPMR, with controllable magnitudes of exponents and fast convergence, to compute the desired approximation, formally,
 \begin{gather}
 \max_{t\in{}I}{\abs{g\left(t\right)-\sum_jm_j\exp\left(-s_jt\right)}}<\epsilon,
 \end{gather}
@@ -231,7 +234,9 @@ By using VPMR, it is feasible to convert nonviscous damping with arbitrary (in t
 \end{algorithmic}
 \end{breakablealgorithm}
 
-It is worth emphasising that converting the desired kernel functions to sums of exponentials a) is independent of the dynamic system of interest and b) is performed offline, viz., ahead of time. Combining with \algoref{algo:vpmr}, the following procedure can be employed to model nonviscously damped systems with arbitrary kernels.
+It is worth emphasising that converting the desired kernel functions to sums of exponentials a) is independent of the dynamic system of interest and b) is performed offline, viz., ahead of time.
+\add{Compared to the conventional solving procedure for undamped systems, the additional cost is solely governed by the number of exponentials used, as \eqsref{eq:revised_k_comp} and \eqsref{eq:revised_y_comp} only require summations of scaled matrices/vectors.}
+Combining with \algoref{algo:vpmr}, the following procedure can be employed to model nonviscously damped systems with arbitrary kernels.
 \begin{Objective}
 \begin{enumerate}
 \item Determine number and form of kernels $g^k$, and the corresponding $\mb{T}^k$, to be used.
