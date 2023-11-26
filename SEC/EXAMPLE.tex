@@ -6,6 +6,7 @@ We start with the validation of \algoref{algo:single_model}. To this end, consid
 \begin{gather}
 m\ddot{u}\left(t\right)+\int_0^tc\mu\exp\left(-\mu\left(t-\tau\right)\right)\dot{u}\left(\tau\right)\md{\tau}+ku\left(t\right)=p\left(t\right).
 \end{gather}
+\add{It shall be pointed out that, due to conventions, $m$ is used to represent the mass of the oscillator in the current context. The same symbol has been used in the previous derivation, see, e.g., \eqsref{eq:single_conv}. Please note the different meanings in various contexts.}
 The parameters are set to $m=1$, $c=2$, $\mu=1$, $k=100$.
 The initial conditions are $u\left(0\right)=1$, $\dot{u}\left(0\right)=0$ and $\ddot{u}\left(0\right)=-100$\replace{.}{for free vibration, namely, $p\left(t\right)=0$.} The \add{corresponding} closed form solution can be \replace{found}{derived, the procedure is presented} in \secref{sec:analytical_sdof}.
 The displacement history and the corresponding error convergence are shown in \figref{fig:sdof}.
@@ -17,17 +18,31 @@ The maximum of the difference between numerical and analytical solutions is take
 \caption{displacement history and error analysis of SDOF oscillator with one exponential kernel (free vibration)}\label{fig:sdof}
 \end{figure}
 
+\add{Regarding the computational efficiency, \tabref{tab:sdof_cost} presents the wall clock time required to perform an analysis for \SI{10}{\second} with different time step sizes.
+Since only one exponential is used, computing the damping contribution is relatively easy. On a recent laptop, compared to the cases without damping, the additional cost is below \SI{10}{\percent}.
+\begin{table}[H]
+\centering\footnotesize
+\caption{wall clock time for SDOF oscillator (average of \num{50} runs)}\label{tab:sdof_cost}
+\begin{tabular}{rrrrr}
+    \toprule
+    $\Delta{}t$ & number of steps & w/o damping (\si{\second}) & w/ damping (\si{\second}) & relative extra cost (\%) \\ \midrule
+    \num{0.010} &      \num{1000} &                \num{0.174} &               \num{0.190} &               \num{9.30} \\
+    \num{0.005} &      \num{2000} &                \num{0.331} &               \num{0.358} &               \num{7.98} \\
+    \num{0.002} &      \num{5000} &                \num{0.794} &               \num{0.860} &               \num{8.33} \\
+    \num{0.001} &     \num{10000} &                \num{1.573} &               \num{1.693} &               \num{7.63} \\ \bottomrule
+\end{tabular}
+\end{table}}
+
 \add{For forced vibration, the following initial conditions are chosen: $u\left(0\right)=\dot{u}\left(0\right)=\ddot{u}\left(0\right)=0$. The external force is defined as a sinusoid wave, namely,
 \begin{gather}
 p\left(t\right)=100\sin\left(0.4\pi{}t\right).
 \end{gather}
-The corresponding analytical solution can be sought by using the same technique as shown in \secref{sec:analytical_sdof} but with a more cumbersome algebraic operations. The displacement history and the corresponding convergence performance are shown in \figref{fig:sdof_forced}. Similar to the free vibration case, the second-order accuracy is retained.
+The corresponding analytical solution can be sought by using the same technique as shown in \secref{sec:analytical_sdof} but with a more cumbersome algebraic operations (not shown for brevity). The displacement history and the corresponding convergence performance are shown in \figref{fig:sdof_forced}. Similar to the free vibration case, the second-order accuracy is retained.
 \begin{figure}[H]
 \centering
 \includegraphics{PY/single_forced}
 \caption{displacement history and error analysis of SDOF oscillator with one exponential kernel (forced vibration)}\label{fig:sdof_forced}
-\end{figure}
-}
+\end{figure}}
 \subsection{Three DOF System With Two Exponentials}
 A three-degree-of-freedom system shown in \figref{fig:three_dof} is adopted to demonstrate the applicability of the proposed algorithm in MDOF systems. This example is also adopted by some of aforementioned work \cite[see, e.g.,][]{Adhikari2004,Cortes2009,Shen2019,Liu2023}.
 \begin{figure}[H]
@@ -120,7 +135,26 @@ can be used. The sum-of-exponential approximations given by the VPMR algorithm a
 \end{figure}
 The tolerance \num{e-12} used for kernel approximation is considered accurate in this example for $\Delta{}t\approx\num{e-3}$. In practice, one can determine the tolerance based on the time step size, which can be chosen based on the properties of the dynamic system of interest, such that a proper number of exponentials would be used to balance between accuracy and efficiency. \figref{fig:three_gauss} compares the results with different time step sizes. Numerical results obtained by using other methods can be seen elsewhere \citep{Shen2021}.
 
-For this particular example with a few DoFs and elements, the extra time required by nonviscous damping (\num{13} exponentials) is around \SI{15}{\percent} of total analysis time. Noting that the approximation of kernel is computed offline and does not change with the size of dynamic system, thus the extra computational cost is constant for each substep, rather than growing linearly with the number of substeps in direct/explicit convolution quadrature methods. As the main computational cost attributes to solving global effective stiffness for large systems, \eqsref{eq:composition} provides an efficient implementation of nonviscous damping.
+\add{In terms of the computational efficiency, \tabref{tab:three_cost} lists the wall clock time required to perform an analysis for \SI{50}{\second} with different time step sizes.
+For this particular example with a few DoFs and elements, the extra time required by nonviscous damping (\num{13} exponentials) mainly attributes to the update of \eqsref{eq:revised_k_comp}.
+It is relatively costly compared to state determination of other spring/mass elements.
+Noting that the approximation of kernel is computed offline and does not change with the size of dynamic system, the extra computational cost is constant for each substep, rather than growing linearly with the number of substeps in direct/explicit convolution quadrature methods.
+As a result, it can be observed that the extra cost stays around the same level (\SI{27}{\percent} in this particular example) regardless of time step size.
+As the main computational cost attributes to solving global effective stiffness for large systems, \eqsref{eq:composition} provides an efficient implementation of nonviscous damping.
+It, however, must be pointed out that the additional computational cost is directly related to the number of exponentials used. Thus, one shall always prefer to use fewer exponentials.
+\begin{table}[H]
+\centering\footnotesize
+\caption{wall clock time for three DOF system (average of \num{20} runs)}\label{tab:three_cost}
+\begin{tabular}{rrrrr}
+    \toprule
+    $\Delta{}t$ & number of steps & w/o damping (\si{\second}) & w/ damping (\si{\second}) & relative extra cost (\%) \\ \midrule
+    \num{0.010} &      \num{5000} &                \num{1.298} &               \num{1.649} &              \num{27.10} \\
+    \num{0.005} &     \num{10000} &                \num{2.585} &               \num{3.278} &              \num{26.78} \\
+    \num{0.002} &     \num{25000} &                \num{6.476} &               \num{8.210} &              \num{26.78} \\
+    \num{0.001} &     \num{50000} &               \num{13.092} &              \num{16.445} &              \num{25.61} \\ \bottomrule
+\end{tabular}
+\end{table}
+}
 \subsection{Three DOF System With Sigmoid Kernels}
 Since, in principle, any dissipative functions can be used as kernels, we further present a sigmoid kernel of the following form,
 \begin{gather}
