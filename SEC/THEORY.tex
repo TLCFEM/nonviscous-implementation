@@ -190,6 +190,7 @@ in its explicit form,
 \bbf=\sum_{k=1}^{i}\sum_{l=1}^{j^k}\bbf_l^k=\sum_{k=1}^{i}\sum_{l=1}^{j^k}g_l^k\left(t\right)\bw^k=\sum_{k=1}^{i}\sum_{l=1}^{j^k}m_l^k\exp\left(-s_l^kt\right)\bw^k.
 \end{gather}
 In the above, $m_l^k$ and $s_l^k$ are the parameters for the $l$-th component of the $k$-th kernel, $\bw^k=\mb{T}^k\bv$ can be obtained by either node-based or element-based rules. For the former, it is assumed different regions (characterised by nodes) possess different damping responses. For the latter, it is assumed different elements possess different damping responses, similar to a typical assembly process, example applications can be seen elsewhere \citep{Friswell2007}.
+\add{In a broader configuration, $\mb{T}^k$ can also be defined as a combination of stiffness and mass matrices.}
 No matter how $\bw^k$ is constructed, the revised stiffness and resistance for each $\bbf_l^k$ only require vector--scalar operations (while $\bw^k$ itself may be computed based on $\bv$ via matrix--vector operations).
 
 Since additivity still holds, there is no essential difference between \eqsref{eq:sum_conv} and \eqsref{eq:composition}, the same discretisation can be applied so that the revised stiffness and resistance can be obtained as
