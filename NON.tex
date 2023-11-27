@@ -1,6 +1,6 @@
 \documentclass[3p,11pt,fleqn,review,sort&compress]{elsarticle}
 \bibliographystyle{elsarticle-num-names}
-\usepackage{amsmath,amsfonts,amssymb,siunitx,float,subcaption,setspace,booktabs,diagbox,bm,tikz,structmech,mathtools,tikz-3dplot,pgfplots,gnuplot-lua-tikz,url,fontawesome5}
+\usepackage{amsmath,amsfonts,amssymb,siunitx,float,subcaption,setspace,booktabs,diagbox,bm,tikz,structmech,mathtools,tikz-3dplot,pgfplots,url,fontawesome5}
 \usepackage{easyReview}
 \usepackage{algorithm}
 \usepackage{algpseudocode}
@@ -67,7 +67,7 @@
 }}{\kern2pt\hrule\relax
 \end{center}}
 \begin{document}
-\linenumbers\setreviewson
+\linenumbers\setreviewsoff
 \begin{abstract}
 \begin{linenumbers}
 In this work, a fast algorithm to evaluate the dynamic response of nonviscously damped systems with arbitrary distributions of damping characterised by arbitrary kernel functions (both number and form) is proposed. The proposed algorithm requires mere \replace{level 2 BLAS}{matrix--vector} operations. It can be integrated into existing analysis tools with various time integration methods in forms of either element-based dashpots or global damping model. Compared to other existing methods, the proposed algorithm does not explicitly evaluate the convolution integral and thus does not require the storage of the whole velocity history. It shows superior accuracy while the corresponding computational cost is low.
