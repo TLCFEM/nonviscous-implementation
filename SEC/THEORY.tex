@@ -152,7 +152,7 @@ If $\mb{T}$ is a diagonal matrix, implying a node-based damping distribution, \e
 %\end{bmatrix}.
 %\end{gather}
 \section{Nonviscous Damping With Arbitrary Kernels}\label{sec:arbitrary}
-\algoref{algo:single_model} alone does not enable adoption of arbitrary kernel functions, thus, it has limited applicability. To allow arbitrary kernels to be used, in this section, we present the strategy to decompose arbitrary kernels with arbitrary distributions into a series of exponential functions. Each of which can be solved by using \algoref{algo:single_model} as the basic building block.
+\algoref{algo:single_model} alone does not enable adoption of arbitrary kernel functions, thus, it has limited applicability. To allow arbitrary kernels to be used, in this section, we present a strategy to decompose arbitrary kernels with arbitrary distributions into a series of exponential functions. Each of which can be solved by using \algoref{algo:single_model} as the basic building block.
 \subsection{Sum of Exponentials}
 Now consider, instead of a single exponential function, multiple exponential functions such that
 \begin{gather}\label{eq:sum_exp}
@@ -167,7 +167,7 @@ For each $\bbf_l$, \eqsref{eq:discretised_c} also holds and only involves $\bbf_
 \bbf_l=\dfrac{2-s_l\Delta{}t}{2+s_l\Delta{}t}\bbf_{l,n}+\dfrac{m_l\Delta{}t}{2+s_l\Delta{}t}\bw_n+\dfrac{m_l\Delta{}t}{2+s_l\Delta{}t}\bw.
 \end{gather}
 
-Similar to the single function case, substituting $\bbf_l$ into \eqsref{eq:eom}, differentiation yields the revised stiffness
+Similar to the single exponential case, substituting $\bbf_l$ into \eqsref{eq:eom}, differentiation yields the revised stiffness
 \begin{gather}\label{eq:revised_k_multi}
 \bhat{K}=\bbar{K}+\sum_{l=1}^{j}\dfrac{m_l\Delta{}t}{2+s_l\Delta{}t}\mb{T}\ddfrac{\bv}{\bu},
 \end{gather}
@@ -176,7 +176,7 @@ and the revised resistance
 \bhat{y}=\mb{y}+\sum_{l=1}^{j}\dfrac{2-s_l\Delta{}t}{2+s_l\Delta{}t}\bbf_{l,n}+\sum_{l=1}^{j}\dfrac{m_l\Delta{}t}{2+s_l\Delta{}t}\bw_n+\sum_{l=1}^{j}\dfrac{m_l\Delta{}t}{2+s_l\Delta{}t}\bw.
 \end{gather}
 
-Noting that within each sum, the operations performed are identical to that in the single function case, the complexity, in this case, is $\mathcal{O}\left(jn\right)$ for both time and space. As long as parameters $m_l$ and $s_l$ are real or pairs of complex conjugates, $\bbf$ is guaranteed to be real.
+Noting that within each sum, the operations performed are identical to that in the single exponential case, the complexity, in this case, is $\mathcal{O}\left(jn\right)$ for both time and space. As long as parameters $m_l$ and $s_l$ are real or pairs of complex conjugates, $\bbf$ is guaranteed to be real.
 \subsection{Damping Composition}
 It is possible to assign different kernels to different subsets of the velocity vector $\bv$. Formally, \eqsref{eq:sum_conv} can be further extended as
 \begin{gather}

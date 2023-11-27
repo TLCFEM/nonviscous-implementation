@@ -43,7 +43,7 @@ For forced vibration, the following initial conditions are chosen: $u\left(0\rig
 \begin{gather}
 p\left(t\right)=100\sin\left(0.4\pi{}t\right).
 \end{gather}
-The corresponding analytical solution can be sought by using the same technique as shown in \secref{sec:analytical_sdof} but with a more cumbersome algebraic operations (not shown for brevity). The displacement history and the corresponding convergence performance are shown in \figref{fig:sdof_forced}. Similar to the free vibration case, the second-order accuracy is retained.
+The corresponding analytical solution can be sought by using the same technique as shown in \secref{sec:analytical_sdof} but with more cumbersome algebraic operations (not shown for brevity). The displacement history and the corresponding convergence performance are shown in \figref{fig:sdof_forced}. Similar to the free vibration case, the second-order accuracy is retained.
 \begin{figure}[H]
 \centering
 \includegraphics{PY/single_forced}
@@ -127,14 +127,14 @@ g_1\left(0\right)=600,\qquad
 g_1\left(0.01\right)\approx\num{0.027},\qquad\int_{0}^{0.01}g_1~\md{t}\approx0.599973.
 \end{gather}
 Such a rapidly changing function within $t\in[0,0.01]$ can hardly be accurately integrated by solely using values at two ends.
-As the adopted trapezoidal rule is A-stable, it is free from similar issues. Other recommended methods (BDF2 family) are also second-order accurate and A-stable.
+As the adopted trapezoidal rule is A-stable, it is free from similar issues. Other recommended methods (BDF family) are also second-order accurate. Among them, BDF2 is also A-stable.
 \subsection{Three DOF System With Two Gaussian Kernels}
 In the previous example, instead of two exponential kernels, two Gaussian kernels
 \begin{gather}
 g_1=1.2\sqrt{\dfrac{1}{\pi}}\exp\left(-t^2\right),\qquad
 g_2=0.4\sqrt{\dfrac{5}{\pi}}\exp\left(-5t^2\right),
 \end{gather}
-can be used. The sum-of-exponential approximations given by the VPMR algorithm are shown in \figref{fig:vpmr}. With a chosen tolerance around \num{e-12}, only \num{13} exponentials are required. The corresponding $m_l$ and $s_l$ parameters are given in \secref{sec:vpmr}.
+can be used. The sum-of-exponential approximations given by the VPMR algorithm are shown in \figref{fig:vpmr}. With a chosen tolerance around \num{e-12}, only \num{13} exponentials are required. The corresponding parameters $m_l$ and $s_l$ are given in \secref{sec:vpmr}.
 \begin{figure}[H]
 \centering
 \includegraphics{PY/kernel_gauss}
