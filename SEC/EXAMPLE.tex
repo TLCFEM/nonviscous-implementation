@@ -10,13 +10,19 @@ m\ddot{u}\left(t\right)+\int_0^tc\mu\exp\left(-\mu\left(t-\tau\right)\right)\dot
 The parameters are set to $m=1$, $c=2$, $\mu=1$, $k=100$.
 The initial conditions are $u\left(0\right)=1$, $\dot{u}\left(0\right)=0$ and $\ddot{u}\left(0\right)=-100$\replace{.}{for free vibration, namely, $p\left(t\right)=0$.} The \add{corresponding} closed form solution can be \replace{found}{derived, the procedure is presented} in \secref{sec:analytical_sdof}.
 The displacement history and the corresponding error convergence are shown in \figref{fig:sdof}.
-
 The maximum of the difference between numerical and analytical solutions is taken as the absolute error $\epsilon$. It is evident that \eqsref{eq:discretised_c} retains the second-order accuracy of the Newmark method.
 \begin{figure}[H]
 \centering
 \includegraphics{PY/single_exp}
 \caption{displacement history and error analysis of SDOF oscillator with one exponential kernel (free vibration)}\label{fig:sdof}
 \end{figure}
+
+\add{Following a similar presentation elsewhere \citep{Liu2023}, the absolute error history is shown in \figref{fig:sdof_error}.
+\begin{figure}[H]
+\centering
+\includegraphics{PY/single_exp_error}
+\caption{absolute error history of SDOF oscillator with one exponential kernel (free vibration)}\label{fig:sdof_error}
+\end{figure}}
 
 \add{Regarding the computational efficiency, \tabref{tab:sdof_cost} presents the wall clock time required to perform an analysis for \SI{10}{\second} with different time step sizes.
 Since only one exponential is used, computing the damping contribution is relatively easy. On a recent laptop, compared to the cases without damping, the additional cost is below \SI{10}{\percent}.
@@ -42,6 +48,13 @@ The corresponding analytical solution can be sought by using the same technique 
 \centering
 \includegraphics{PY/single_forced}
 \caption{displacement history and error analysis of SDOF oscillator with one exponential kernel (forced vibration)}\label{fig:sdof_forced}
+\end{figure}}
+
+\add{The absolute error history is shown in \figref{fig:sdof_forced_error}.
+\begin{figure}[H]
+\centering
+\includegraphics{PY/single_forced_error}
+\caption{absolute error history of SDOF oscillator with one exponential kernel (forced vibration)}\label{fig:sdof_forced_error}
 \end{figure}}
 \subsection{Three DOF System With Two Exponentials}
 A three-degree-of-freedom system shown in \figref{fig:three_dof} is adopted to demonstrate the applicability of the proposed algorithm in MDOF systems. This example is also adopted by some of aforementioned work \cite[see, e.g.,][]{Adhikari2004,Cortes2009,Shen2019,Liu2023}.

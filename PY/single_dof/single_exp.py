@@ -80,8 +80,9 @@ if __name__ == '__main__':
     results['0.01'] = numerical(sdof, 0.01)
 
     for key, value in results.items():
-        plt.plot(value.time, value.displacement, label=f'$\\Delta{{}}t=${float(key):1.0E}', linestyle=next(LS),
-                 linewidth=.8)
+        plt.plot(
+            value.time, value.displacement, label=f'$\\Delta{{}}t=${float(key):1.0E}', linestyle=next(LS),
+            linewidth=.8)
 
     plt.legend(loc='lower right', ncol=2)
     plt.xlabel('time (s)')
@@ -98,8 +99,9 @@ if __name__ == '__main__':
         error_y.append(np.max(np.abs(value.error)))
 
     result = linregress(np.log(error_x), np.log(error_y))
-    plt.loglog(error_x, np.exp(result[1]) * np.power(error_x, result[0]), 'r--',
-               label=f'slope {result[0]:.3f} $r^2=${result[2] ** 2:.3f}')
+    plt.loglog(
+        error_x, np.exp(result[1]) * np.power(error_x, result[0]), 'r--',
+        label=f'slope {result[0]:.3f} $r^2=${result[2] ** 2:.3f}')
     plt.loglog(error_x, error_y, 'o')
     plt.grid(which='both', linestyle='--', linewidth=.2)
     plt.legend()
@@ -109,3 +111,21 @@ if __name__ == '__main__':
     fig.tight_layout(pad=.1)
     plt.show()
     fig.savefig('../single_exp.pdf')
+
+    fig = plt.figure(figsize=(6, 2))
+
+    for key, value in results.items():
+        plt.plot(
+            value.time, np.abs(value.error), label=f'$\\Delta{{}}t=${float(key):1.0E}', linestyle=next(LS),
+            linewidth=.8)
+
+    plt.yscale('log')
+    plt.legend(loc='lower right', ncol=2)
+    plt.xlabel('time (s)')
+    plt.ylabel('absolute error $\\epsilon$')
+    plt.grid(which='both', linestyle='--', linewidth=.2)
+    plt.xlim(0, 10)
+
+    fig.tight_layout(pad=.1)
+    plt.show()
+    fig.savefig('../single_exp_error.pdf')

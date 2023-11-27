@@ -3,7 +3,7 @@ In this work, a performant general--purpose algorithm integrating nonviscous dam
 The proposed algorithm solves the nonviscously damped dynamic systems directly in the time domain and uses the VPMR algorithm to approximate arbitrary kernels.
 The proposed algorithm can be implemented as either a global damping model or element style nonviscous dashpot, it minimises the computational cost with superior accuracy and can be integrated with various direct time integration methods.
 
-\add{The proposed algorithm offers an alternative tool to perform numerical analyses. However, in terms of identification and quantification of nonviscous damping, numerical results shall be validated against read structure data, and this is recommended for future research.}
+\add{The proposed algorithm offers an alternative tool to perform numerical analyses. However, in terms of identification and quantification of nonviscous damping, numerical results shall be validated against real structure data, and this is recommended for future research.}
 
 An open source port of the VPMR algorithm is available online\footnote{https://github.com/TLCFEM/vpmr}.
 The nonviscous damping has been implemented in \texttt{suanPan} \citep{Chang2023} as both a dashpot element and a global damping model. All numerical models and the corresponding analytical solutions (if applicable) are available in this repository\footnote{https://github.com/TLCFEM/nonviscous-implementation}.

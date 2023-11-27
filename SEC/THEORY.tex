@@ -1,7 +1,7 @@
 \section{An Efficient Algorithm for Systems With A Single Exponential Kernel}\label{sec:single}
 The present section introduces an enhancement of the algorithm proposed by \citet{Adhikari2004} through optimisation. The improvement is accomplished by reformulating the algorithm into a form that can be extended to account for arbitrary kernel functions.
 \subsection{Nonviscously Damped MDOF System}
-Without loss of generality, consider the equation of motion of a nonviscously damped \textit{inelastic} multi-degree-of-freedom \remove{(MDOF) }system,
+Without loss of generality, instead of \eqsref{eq:single_eom}, consider the equation of motion of a nonviscously damped \textit{inelastic} multi-degree-of-freedom \remove{(MDOF) }system,
 \begin{gather}\label{eq:eom}
 \mb{y}+\bbf=\mb{p},
 \end{gather}
@@ -51,6 +51,7 @@ one may further rearrange to obtain}
 \bbf_{n+1}=\dfrac{2-s\Delta{}t}{2+s\Delta{}t}\bbf_n+\dfrac{m\Delta{}t}{2+s\Delta{}t}\bw_n+\dfrac{m\Delta{}t}{2+s\Delta{}t}\bw_{n+1},
 \end{gather}
 in which subscripts $\left(\cdot\right)_n$ and $\left(\cdot\right)_{n+1}$ denote the corresponding quantity at $t_n$ and $t_{n+1}=t_n+\Delta{}t$.
+\add{It shall be noted that the \textit{implicit} trapezoidal rule is used, however, due to the special form of \eqsref{eq:single_conv_ode}, $\bbf_{n+1}$ can be \textit{explicitly} expressed as in \eqsref{eq:discretised_c}. This allows the following formulation.}
 
 Assuming the equation of motion \eqsref{eq:eom} is satisfied at $t_{n+1}$, then, accounting for \eqsref{eq:discretised_c}, \eqsref{eq:eom} is
 \begin{gather}\label{eq:residual}
@@ -244,7 +245,7 @@ Combining with \algoref{algo:vpmr}, the following procedure can be employed to m
 \item Determine tolerance $\epsilon$ of time history analysis.
 \item Use the VPMR algorithm \citep{Gao2022} to find approximations of kernels with tolerance set to $\epsilon$ such that for each $k$,
 \begin{gather}
-\abs{g^k-\sum_lg^k_l}<\epsilon.
+\abs{g^k-\sum_lm_l^k\exp\left(-s_l^kt\right)}<\epsilon.
 \end{gather}
 \item With parameters $m_l^k$ and $s_l^k$ obtained from the VPMR algorithm, use \algoref{algo:vpmr} to solve the dynamic system.
 \end{enumerate}
