@@ -1,0 +1,43 @@
+name: PDF
+on: [ push ]
+jobs:
+  build_latex:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          export PYTHONPATH=$PWD
+          cd PY/single_dof
+          python single_exp.py
+          cd ../single_forced
+          python single_forced.py
+          cd ../three_dof
+          python three_dof.py
+          python three_gauss.py
+          python kernel.py
+          cd ../three_stiff
+          python three_stiff.py
+          cd ../sigmoid
+          python sigmoid.py
+          cd ../..
+      - name: Compile
+        uses: xu-cheng/texlive-action@v2
+        with:
+          scheme: full
+          run: |
+            latexmk -pdf NON.tex
+      - name: Release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: NON.pdf
+          asset_name: NON.pdf
+          tag: latest
+          overwrite: true

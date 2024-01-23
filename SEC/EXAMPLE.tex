@@ -1,0 +1,195 @@
+\section{Numerical Examples}\label{sec:example}
+In the following examples, units are omitted for brevity.
+The Newmark (constant acceleration) method is used for time integration unless stated otherwise.
+\subsection{SDOF System With Single Exponential}
+We start with the validation of \algoref{algo:single_model}. To this end, consider the free vibration of a SDOF system with one exponential kernel such that the EOM can be expressed as
+\begin{gather}
+m\ddot{u}\left(t\right)+\int_0^tc\mu\exp\left(-\mu\left(t-\tau\right)\right)\dot{u}\left(\tau\right)\md{\tau}+ku\left(t\right)=p\left(t\right).
+\end{gather}
+It shall be pointed out that, due to conventions, $m$ is used to represent the mass of the oscillator in the current context. The same symbol has been used in the previous derivation, see, e.g., \eqsref{eq:single_conv}. Please note the different meanings in various contexts.
+The parameters are set to $m=1$, $c=2$, $\mu=1$, $k=100$.
+The initial conditions are $u\left(0\right)=1$, $\dot{u}\left(0\right)=0$ and $\ddot{u}\left(0\right)=-100$ for free vibration, namely, $p\left(t\right)=0$. The corresponding closed form solution can be derived, the procedure is presented in \secref{sec:analytical_sdof}.
+The displacement history and the corresponding error convergence are shown in \figref{fig:sdof}.
+The maximum of the difference between numerical and analytical solutions is taken as the absolute error $\epsilon$. It is evident that \eqsref{eq:discretised_c} retains the second-order accuracy of the Newmark method.
+\begin{figure}[H]
+\centering
+\includegraphics{PY/single_exp}
+\caption{displacement history and error analysis of SDOF oscillator with one exponential kernel (free vibration)}\label{fig:sdof}
+\end{figure}
+
+Following a similar presentation elsewhere \citep{Liu2023}, the absolute error history is shown in \figref{fig:sdof_error}.
+\begin{figure}[H]
+\centering
+\includegraphics{PY/single_exp_error}
+\caption{absolute error history of SDOF oscillator with one exponential kernel (free vibration)}\label{fig:sdof_error}
+\end{figure}
+
+Regarding the computational efficiency, \tabref{tab:sdof_cost} presents the wall clock time required to perform an analysis for \SI{10}{\second} with different time step sizes.
+Since only one exponential is used, computing the damping contribution is relatively easy. On a recent laptop, compared to the cases without damping, the additional cost is below \SI{10}{\percent}.
+\begin{table}[H]
+\centering\footnotesize
+\caption{wall clock time for SDOF oscillator (average of \num{50} runs)}\label{tab:sdof_cost}
+\begin{tabular}{rrrrr}
+    \toprule
+    $\Delta{}t$ & number of steps & w/o damping (\si{\second}) & w/ damping (\si{\second}) & relative extra cost (\%) \\ \midrule
+    \num{0.010} &      \num{1000} &                \num{0.174} &               \num{0.190} &               \num{9.30} \\
+    \num{0.005} &      \num{2000} &                \num{0.331} &               \num{0.358} &               \num{7.98} \\
+    \num{0.002} &      \num{5000} &                \num{0.794} &               \num{0.860} &               \num{8.33} \\
+    \num{0.001} &     \num{10000} &                \num{1.573} &               \num{1.693} &               \num{7.63} \\ \bottomrule
+\end{tabular}
+\end{table}
+
+For forced vibration, the following initial conditions are chosen: $u\left(0\right)=\dot{u}\left(0\right)=\ddot{u}\left(0\right)=0$. The external force is defined as a sinusoid wave, namely,
+\begin{gather}
+p\left(t\right)=100\sin\left(0.4\pi{}t\right).
+\end{gather}
+The corresponding analytical solution can be sought by using the same technique as shown in \secref{sec:analytical_sdof} but with more cumbersome algebraic operations (not shown for brevity). The displacement history and the corresponding convergence performance are shown in \figref{fig:sdof_forced}. Similar to the free vibration case, the second-order accuracy is retained.
+\begin{figure}[H]
+\centering
+\includegraphics{PY/single_forced}
+\caption{displacement history and error analysis of SDOF oscillator with one exponential kernel (forced vibration)}\label{fig:sdof_forced}
+\end{figure}
+
+The absolute error history is shown in \figref{fig:sdof_forced_error}.
+\begin{figure}[H]
+\centering
+\includegraphics{PY/single_forced_error}
+\caption{absolute error history of SDOF oscillator with one exponential kernel (forced vibration)}\label{fig:sdof_forced_error}
+\end{figure}
+\subsection{Three DOF System With Two Exponentials}
+A three-degree-of-freedom system shown in \figref{fig:three_dof} is adopted to demonstrate the applicability of the proposed algorithm in MDOF systems. This example is also adopted by some of aforementioned work \cite[see, e.g.,][]{Adhikari2004,Cortes2009,Shen2019,Liu2023}.
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+\draw[line width=.8mm](2,0)rectangle++(1.5,1);
+\draw[line width=.8mm](5,0)rectangle++(1.5,1);
+\draw[line width=.8mm](8,0)rectangle++(1.5,1);
+\setstructmech{linewidth=.4mm}
+\Spring{.5,.75}{2,.75}{1.5}
+\Spring{3.5,.75}{5,.75}{1.5}
+\Spring{6.5,.75}{8,.75}{1.5}
+\Spring{9.5,.75}{11,.75}{1.5}
+\Dashpot{6.5,.25}{8,.25}{1.5}
+\Dashpot{.5,.25}{2,.25}{1.5}
+\Dashpot{4,-.5}{5.5,-.5}{1.5}
+\FixedSupport[-90]{.5,.5}{2}
+\FixedSupport[90]{11,.5}{2}
+\FixedSupport[-90]{4,-.5}
+\draw[line width=.4mm](5.5,-.5)--++(0,.5);
+\draw[|->](2.75,1.25)--++(.5,0)node[above]{$x_1$};
+\draw[|->](5.75,1.25)--++(.5,0)node[above]{$x_2$};
+\draw[|->](8.75,1.25)--++(.5,0)node[above]{$x_3$};
+\node at(2.75,.5){$m$};
+\node at(5.75,.5){$m$};
+\node at(8.75,.5){$m$};
+\node at(1.25,1.25){$k$};
+\node at(4.25,1.25){$k$};
+\node at(7.25,1.25){$k$};
+\node at(10.25,1.25){$k$};
+\node at(1.25,-.5){$g_1$};
+\node at(4.75,-1.25){$g_1$};
+\node at(7.25,-.5){$g_2$};
+\end{tikzpicture}
+\caption{three DOF system with two exponential kernels}\label{fig:three_dof}
+\end{figure}
+The parameters are set to $m=3$, $k=2$ and
+\begin{gather}
+g_1=\num{0.6}\exp\left(-t\right),\qquad
+g_2=\exp\left(-5t\right).
+\end{gather}
+The initial conditions are $x_1\left(0\right)=1$, $x_2\left(0\right)=x_3\left(0\right)=0$, and $\dot{x}_1\left(0\right)=\dot{x}_2\left(0\right)=\dot{x}_3\left(0\right)=0$. One can compute the initial acceleration using the analytical solution such that $\ddot{x}_1\left(0\right)=-4/3$, $\ddot{x}_2\left(0\right)=2/3$ and $\ddot{x}_3\left(0\right)=0$.
+The analytical solution can be obtained via modal analysis/expansion, the relevant derivations can be seen elsewhere \citep{Wagner2003}.
+
+The displacement histories of three DoFs are depicted in \figref{fig:three}.
+\begin{figure}[H]
+\centering
+\includegraphics{PY/three_dof}
+\caption{displacement history and error analysis of three DOF system with two exponential kernels}\label{fig:three}
+\end{figure}
+
+Compared to the numerical solutions (with $\Delta{}t=\SI{0.05}{\second}$) obtained by \citet{Cortes2009}, the present algorithm yields more accurate results. Even for a large time step $\Delta{}t=\SI{0.1}{\second}$, there is no severe deviation observed, unlike some other methods \citep{Puthanpurayil2014,Liu2014} that poorly integrate the convolution term. Additional error convergence comparisons can be seen elsewhere \citep{Liu2023}. The convergence of absolute error again shows a quadratic order, implying the simple \eqsref{eq:eqv_sys} is effective.
+\subsection{Three DOF System With Stiff Exponential Kernels}
+The two exponential kernels in the previous example are modified to investigate whether the proposed algorithm can cope with stiff problems. The following functions are chosen.
+\begin{gather}
+g_1=600\exp\left(-1000t\right),\qquad
+g_2=400\exp\left(-2000t\right).
+\end{gather}
+
+The corresponding displacement history and error convergence are shown in \figref{fig:three_stiff}. With a large $\mu$, the system behaves more like a viscously damped one.
+\begin{figure}[H]
+\centering
+\includegraphics{PY/three_stiff}
+\caption{displacement history and error analysis of three DOF system with stiff exponential kernels}\label{fig:three_stiff}
+\end{figure}
+The second-order convergence is not affected by the stiff kernel used. This is difficult to achieve with methods that explicit integrate the convolution term if the large time step is not split into smaller segments. Consider a time step of $\Delta{}t=\SI{0.01}{\second}$,
+\begin{gather}
+g_1\left(0\right)=600,\qquad
+g_1\left(0.01\right)\approx\num{0.027},\qquad\int_{0}^{0.01}g_1~\md{t}\approx0.599973.
+\end{gather}
+Such a rapidly changing function within $t\in[0,0.01]$ can hardly be accurately integrated by solely using values at two ends.
+As the adopted trapezoidal rule is A-stable, it is free from similar issues. Other recommended methods (BDF family) are also second-order accurate. Among them, BDF2 is also A-stable.
+\subsection{Three DOF System With Two Gaussian Kernels}
+In the previous example, instead of two exponential kernels, two Gaussian kernels
+\begin{gather}
+g_1=1.2\sqrt{\dfrac{1}{\pi}}\exp\left(-t^2\right),\qquad
+g_2=0.4\sqrt{\dfrac{5}{\pi}}\exp\left(-5t^2\right),
+\end{gather}
+can be used. The sum-of-exponential approximations given by the VPMR algorithm are shown in \figref{fig:vpmr}. With a chosen tolerance around \num{e-12}, only \num{13} exponentials are required. The corresponding parameters $m_l$ and $s_l$ are given in \secref{sec:vpmr}.
+\begin{figure}[H]
+\centering
+\includegraphics{PY/kernel_gauss}
+\caption{approximations of Gaussian kernels using VPMR algorithm}\label{fig:vpmr}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics{PY/three_gauss}
+\caption{displacement history of three DOF system with two Gaussian kernels}\label{fig:three_gauss}
+\end{figure}
+The tolerance \num{e-12} used for kernel approximation is considered accurate in this example for $\Delta{}t\approx\num{e-3}$. In practice, one can determine the tolerance based on the time step size, which can be chosen based on the properties of the dynamic system of interest, such that a proper number of exponentials would be used to balance between accuracy and efficiency. \figref{fig:three_gauss} compares the results with different time step sizes. Numerical results obtained by using other methods can be seen elsewhere \citep{Shen2021}.
+
+In terms of the computational efficiency, \tabref{tab:three_cost} lists the wall clock time required to perform an analysis for \SI{50}{\second} with different time step sizes.
+For this particular example with a few DoFs and elements, the extra time required by nonviscous damping (\num{13} exponentials) mainly attributes to the update of \eqsref{eq:revised_k_comp}.
+It is relatively costly compared to state determination of other spring/mass elements.
+Noting that the approximation of kernel is computed offline and does not change with the size of dynamic system, the extra computational cost is constant for each substep, rather than growing linearly with the number of substeps in direct/explicit convolution quadrature methods.
+As a result, it can be observed that the extra cost stays around the same level (\SI{27}{\percent} in this particular example) regardless of time step size.
+As the main computational cost attributes to solving global effective stiffness for large systems, \eqsref{eq:composition} provides an efficient implementation of nonviscous damping.
+It, however, must be pointed out that the additional computational cost is directly related to the number of exponentials used. Thus, one shall always prefer to use fewer exponentials.
+\begin{table}[H]
+\centering\footnotesize
+\caption{wall clock time for three DOF system (average of \num{20} runs)}\label{tab:three_cost}
+\begin{tabular}{rrrrr}
+    \toprule
+    $\Delta{}t$ & number of steps & w/o damping (\si{\second}) & w/ damping (\si{\second}) & relative extra cost (\%) \\ \midrule
+    \num{0.010} &      \num{5000} &                \num{1.298} &               \num{1.649} &              \num{27.10} \\
+    \num{0.005} &     \num{10000} &                \num{2.585} &               \num{3.278} &              \num{26.78} \\
+    \num{0.002} &     \num{25000} &                \num{6.476} &               \num{8.210} &              \num{26.78} \\
+    \num{0.001} &     \num{50000} &               \num{13.092} &              \num{16.445} &              \num{25.61} \\ \bottomrule
+\end{tabular}
+\end{table}
+\subsection{Three DOF System With Sigmoid Kernels}
+Since, in principle, any dissipative functions can be used as kernels, we further present a sigmoid kernel of the following form,
+\begin{gather}
+g_1=g_2=\dfrac{1}{1+\exp\left(20x-20\right)},
+\end{gather}
+which approximates the step function
+\begin{gather}
+g_1=g_2=\left\{
+\begin{array}{ll}
+1&t\leqslant1,\\
+0&\text{otherwise.}
+\end{array}
+\right.
+\end{gather}
+
+The VPMR approximation (with a chosen tolerance around \num{e-4}) is given in \figref{fig:sigmoid_kernel} while the displacement histories with different step sizes are given in \figref{fig:three_sigmoid}. Since no analytical solution is available, no comparisons would be given. Nevertheless, one could use the result in \figref{fig:three_sigmoid} as a reference for future comparisons.
+\begin{figure}[H]
+\centering
+\includegraphics{PY/kernel_sigmoid}
+\caption{sigmoid kernel}\label{fig:sigmoid_kernel}
+\end{figure}
+\begin{figure}[H]
+\centering
+\includegraphics{PY/sigmoid}
+\caption{displacement history of three DOF system with the sigmoid kernel}\label{fig:three_sigmoid}
+\end{figure}

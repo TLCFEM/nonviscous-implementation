@@ -1,0 +1,253 @@
+\section{An Efficient Algorithm for Systems With A Single Exponential Kernel}\label{sec:single}
+The present section introduces an enhancement of the algorithm proposed by \citet{Adhikari2004} through optimisation. The improvement is accomplished by reformulating the algorithm into a form that can be extended to account for arbitrary kernel functions.
+\subsection{Nonviscously Damped MDOF System}
+Without loss of generality, instead of \eqsref{eq:single_eom}, consider the equation of motion of a nonviscously damped \textit{inelastic} multi-degree-of-freedom system,
+\begin{gather}\label{eq:eom}
+\mb{y}+\bbf=\mb{p},
+\end{gather}
+where $\mb{y}=\mb{y}\left(\bu,\bv,\ba\right)$ is the resistance vector of the system, $\mb{p}=\mb{p}\left(t\right)$ is the external load vector as in \eqsref{eq:single_eom}, and $\bbf$ is the nonviscous damping force which can be expressed in the form of the convolution of the kernel $g=g\left(t\right)$ and the vector $\bw$, viz., $\bbf\left(t\right)=\left(g*\bw\right)\left(t\right)$.
+
+Note here, $\bw$ can be either the exact velocity vector $\bv$, or a vector that depends on $\bv$ (e.g., a subset of $\bv$). Formally, it can be represented by
+\begin{gather}\label{eq:wv}
+\bw=\mb{T}\bv,
+\end{gather}
+where $\mb{T}$ picks the participating DoFs, and can be, for example, a square diagonal matrix with its diagonal entries being either one or zero. If $\mb{T}$ is the identity matrix, then $\bw=\bv$, the convolution is expressed in the conventional form. \eqsref{eq:wv} is beneficial when it comes to compositing flexible damping based on different node/element-based rules. It will be discussed later in this work.
+\subsection{A Single Exponential Kernel}
+We start with the scalar-valued exponential kernel function
+\begin{gather}
+g=g\left(t\right)=m\exp\left(-st\right),
+\end{gather}
+where $s$ is often denoted by the relaxation parameter $\mu$, $m$ is often denoted by $c\mu$ in which $c$ is the damping constant. In this work, $s$ and $m$ are adopted for brevity.
+The convolution can be then expressed as
+\begin{gather}\label{eq:single_conv}
+\bbf\left(t\right)=\left(g*\bw\right)\left(t\right)=\int_0^tg(t-\tau)\cdot\bw\left(\tau\right)~\md{\tau}=\int_0^tm\exp\left(-s\left(t-\tau\right)\right)\cdot\bw\left(\tau\right)~\md{\tau}.
+\end{gather}
+\eqsref{eq:single_conv} corresponds to the solution of the following ODE \citep[see, e.g.,][\S~80]{Zwillinger2021},
+\begin{gather}\label{eq:single_conv_ode}
+\dot{\bbf}=-s\bbf+m\bw.
+\end{gather}
+It can be validated by solving \eqsref{eq:single_conv_ode} with the assistance of the integrating factor $\exp\left(st\right)$. Here it is assumed that $\bbf\left(0\right)=\mb{0}$. \eqsref{eq:single_conv_ode} and its similar forms are widely used in constitutive modelling in terms of viscoelastic materials \citep[e.g.,][]{Muravyov1998} and hardening rules \citep[e.g.,][]{Chaboche1989}.
+\subsection{An Efficient Direct Time Integration Algorithm}
+Instead of directly integrating \eqsref{eq:single_conv} using higher-order methods (such as the Runge--Kutta family), to develop an efficient algorithm, \eqsref{eq:single_conv_ode} can be combined with \eqsref{eq:eom} such that the system becomes
+\begin{gather}\label{eq:eqv_sys}
+\left\{
+\begin{array}{l}
+\dot{\bbf}=-s\bbf+m\bw,\\
+\mb{y}+\bbf=\mb{p},
+\end{array}\right.
+\end{gather}
+in which the first equation is a first-order ODE (of $\bbf$) while the second equation is a second-order ODE (of $\bu$).
+
+Given that popular time integration methods are of second-order accuracy, in the context of a discretised iterative solving schema, \eqsref{eq:single_conv_ode} can be rewritten as follows using the (implicit) trapezoidal rule, which is second-order accurate and A-stable,
+\begin{gather}
+\bbf_{n+1}=\bbf_n+\dfrac{\Delta{}t}{2}\left(\dot{\bbf}_n+\dot{\bbf}_{n+1}\right).
+\end{gather}
+Expanding gives
+\begin{gather}
+\bbf_{n+1}=\bbf_n+\dfrac{\Delta{}t}{2}\left(\left(-s\bbf_{n}+m\bw_{n}\right)+\left(-s\bbf_{n+1}+m\bw_{n+1}\right)\right),
+\end{gather}
+one may further rearrange to obtain
+\begin{gather}\label{eq:discretised_c}
+\bbf_{n+1}=\dfrac{2-s\Delta{}t}{2+s\Delta{}t}\bbf_n+\dfrac{m\Delta{}t}{2+s\Delta{}t}\bw_n+\dfrac{m\Delta{}t}{2+s\Delta{}t}\bw_{n+1},
+\end{gather}
+in which subscripts $\left(\cdot\right)_n$ and $\left(\cdot\right)_{n+1}$ denote the corresponding quantity at $t_n$ and $t_{n+1}=t_n+\Delta{}t$.
+It shall be noted that the \textit{implicit} trapezoidal rule is used, however, due to the special form of \eqsref{eq:single_conv_ode}, $\bbf_{n+1}$ can be \textit{explicitly} expressed as in \eqsref{eq:discretised_c}. This allows the following formulation.
+
+Assuming the equation of motion \eqsref{eq:eom} is satisfied at $t_{n+1}$, then, accounting for \eqsref{eq:discretised_c}, \eqsref{eq:eom} is
+\begin{gather}\label{eq:residual}
+\mb{y}_{n+1}+\dfrac{2-s\Delta{}t}{2+s\Delta{}t}\bbf_n+\dfrac{m\Delta{}t}{2+s\Delta{}t}\bw_n+\dfrac{m\Delta{}t}{2+s\Delta{}t}\bw_{n+1}=\mb{p}_{n+1}.
+\end{gather}
+Differentiation leads to the following revised effective stiffness $\bhat{K}_{n+1}$,
+\begin{gather}\label{eq:revised_k}
+\bhat{K}_{n+1}=\bbar{K}_{n+1}+\dfrac{m\Delta{}t}{2+s\Delta{}t}\mb{T}\ddfrac{\bv_{n+1}}{\bu_{n+1}},
+\end{gather}
+in which $\bbar{K}_{n+1}$ denotes the conventional effective stiffness that can be expressed as
+\begin{gather}
+\bbar{K}_{n+1}=\ddfrac{\mb{y}_{n+1}}{\bu_{n+1}}=\mb{K}_{n+1}+\mb{C}_{n+1}\ddfrac{\bv_{n+1}}{\bu_{n+1}}+\mb{M}_{n+1}\ddfrac{\ba_{n+1}}{\bu_{n+1}}.
+\end{gather}
+The viscous damping matrix $\mb{C}$ is included here for generality. It may not be trivial as the system may consist of viscous damping components (e.g., viscous damper devices). Typically, quantities $\ddfrac{\bv_{n+1}}{\bu_{n+1}}$ and $\ddfrac{\ba_{n+1}}{\bu_{n+1}}$ reduce to scalar constants (multiplied by an identity matrix), for example, in the Newmark method, $\ddfrac{\bv_{n+1}}{\bu_{n+1}}=\dfrac{\gamma}{\beta\Delta{}t}$. It can be seen from \eqsref{eq:revised_k} that to account for nonviscous damping in existing viscous damping algorithms, only the damping matrix needs to be revised such that
+\begin{gather}
+\bhat{C}_{n+1}=\mb{C}_{n+1}+\dfrac{m\Delta{}t}{2+s\Delta{}t}\mb{T}.
+\end{gather}
+The extra term $\dfrac{m\Delta{}t}{2+s\Delta{}t}\mb{T}$ involves only scalar-matrix product, and $\mb{T}$ is often sparse or even diagonal (using a node-based distribution rule). It does not alter any other parts of the established solving algorithm (for viscous systems).
+
+By introducing the revised resistance $\bhat{y}_{n+1}$ as
+\begin{gather}\label{eq:revised_y}
+\bhat{y}_{n+1}=\mb{y}_{n+1}+\dfrac{2-s\Delta{}t}{2+s\Delta{}t}\bbf_n+\dfrac{m\Delta{}t}{2+s\Delta{}t}\bw_n+\dfrac{m\Delta{}t}{2+s\Delta{}t}\bw_{n+1},
+\end{gather}
+the linearised system to be solved is
+\begin{gather}\label{eq:revised_system}
+\bhat{K}_{n+1}\delta\bu=\mb{p}_{n+1}-\bhat{y}_{n+1}.
+\end{gather}
+\begin{Objective}
+%\begin{rmk}
+The implicit trapezoidal rule is second-order accurate. It is adopted to improve the overall accuracy accounting for the fact that most time integration methods are second-order accurate. Since the implicit trapezoidal rule is A-stable, the overall result is stable as long as the adopted time integration method is stable.
+
+\eqsref{eq:discretised_c} is expressed in a form that is compatible with single-step algorithms. It thus can be used with other single-step time integration methods. Nevertheless, apart from the implicit trapezoidal rule, other methods can be applied to discretise \eqsref{eq:single_conv_ode}. The following are some examples.
+\begin{enumerate}
+\item For the Bathe two-step method \citep{Noh2019}, the TR-BDF2 method \citep{Bank1985} can be used.
+\item For the OALTS method \citep{Zhang2021}, the BDF2 method can be used.
+\item For the generalised-$\alpha$ method \citep{Chung1993} and the GSSSS method \citep{Zhou2003}, the variable step size BDF2 method can be used.
+\end{enumerate}
+%\end{rmk}
+\end{Objective}
+
+Given that the discretisation \eqsref{eq:discretised_c} does not introduce additional assumptions regarding the system itself, \eqsref{eq:revised_system} is universal and can be applied to both elastic and inelastic systems. In the context of inelastic systems, the local iteration body is summarised in \algoref{algo:single_model} with subscript $\left(\cdot\right)_{n+1}$ dropped for brevity.
+The steps with a leading \faMicrochip~symbol augment global effective stiffness and resistance to obtain $\bhat{K}$ and $\bhat{y}$. Those are additional steps that need to be computed compared to a conventional algorithm for viscously damped systems. Once convergence is achieved, it is necessary to store the history of nonviscous damping force $\bbf_n\leftarrow\bbf$.
+\begin{breakablealgorithm}
+\setstretch{1.6}
+\caption{iteration body of solving nonviscously damped system with one exponential kernel}\label{algo:single_model}
+\begin{algorithmic}
+\State \textbf{*Schema: Newmark + Trapezoidal}
+\State \textbf{Input}: $\bbar{K}$, $\bu$, $\bv$, $\mb{y}$, $\mb{p}$ (quantities obtained via conventional manner as if there is no nonviscous damping) and $\bbf_n$, $m$, $s$
+\State \textbf{Output}: $\bu$
+\State compute $\bw$ from $\bv$
+\State \faMicrochip~compute nonviscous damping force $\bbf=\dfrac{2-s\Delta{}t}{2+s\Delta{}t}\bbf_n+\dfrac{m\Delta{}t}{2+s\Delta{}t}\bw_n+\dfrac{m\Delta{}t}{2+s\Delta{}t}\bw$\Comment{\eqsref{eq:discretised_c}}
+\State \faMicrochip~compute revised stiffness $\bhat{K}=\bbar{K}+\dfrac{m\Delta{}t}{2+s\Delta{}t}\mb{T}\ddfrac{\bv}{\bu}$\Comment{\eqsref{eq:revised_k}}
+\State \faMicrochip~compute revised resistance $\bhat{y}=\mb{y}+\bbf$\Comment{\eqsref{eq:revised_y}}
+\State $\delta\bu=\bhat{K}^{-1}\left(\mb{p}-\bhat{y}\right)$\Comment{\eqsref{eq:revised_system}}
+\State update and return $\bu\leftarrow\bu+\delta\bu$
+\end{algorithmic}
+\end{breakablealgorithm}
+
+Upon careful comparison, it becomes evident that the algorithm presented bears resemblance to the one discussed by \citet{Adhikari2004}. However, there are differences between them. Specifically, \algoref{algo:single_model} tracks the history of nonviscous damping force, and it does not differentiate between full-rank and rank-deficient cases. As a result, it eliminates the need for any supplementary matrix factorisations. \algoref{algo:single_model} directly discretises the EOM \eqsref{eq:eqv_sys} without converting it to a first-order system via the state space.
+
+Unlike other algorithms, such as the one by \citet{Cortes2009}, \algoref{algo:single_model} does not impose additional requirements on the time integration method used. Some existing state space methods manage to eliminate the convolution integral term from the \textbf{continuous} version of \eqsref{eq:eom} \citep[see][]{Wagner2003,Wu2019}, which, in the writers' opinion, overcomplicates the solution procedure in the context of \textit{numerical} analysis, given that the analytical first-order ODE in the state space would still need to be discretised \citep{Adhikari2004} and numerically integrated for general systems. Nonetheless, whenever analytical solutions are sought, those methods may provide extra merits that direct time integration methods do not offer.
+\subsection{Complexity Analysis}
+If $\mb{T}$ is a diagonal matrix, implying a node-based damping distribution, \eqsref{eq:revised_k} requires $n$ additional floating point number arithmetic while \eqsref{eq:revised_y} requires $3n$, with $n$ denoting the size of the system. The total number of additional floating point number multiplications is $4n$, that is a time complexity of $\mathcal{O}\left(n\right)$. If an element-based damping distribution rule is used, $\mb{T}$ would have a structure similar to that of $\mb{K}$. Assuming $\mb{T}$ contains $m$ nonzero scalars, the total number of additional floating point number multiplications is $3n+m$.
+
+\algoref{algo:single_model} requires no memory reallocation, the additional storage needed is for the nonviscous damping forces $\bbf_n$, implying a space complexity of $n$. The matrix $\mb{T}$ may also need to be stored depending on the specific form it has.
+%\subsection{Stability Analysis}
+%For brevity, we consider the decoupled single-degree-of-freedom version of \eqsref{eq:eqv_sys} with the Newmark method and the trapezoidal rule \eqsref{eq:discretised_c}. Furthermore, let $\bw=\bv$. To obtain the amplification matrix, one shall compute the first-order form of Newmark's operator first. By premultiplying the approximation formulas by mass $M$ and accounting for the equilibrium at $t_n$ and $t_{n+1}$, the following expressions can be obtained,
+%\begin{gather}
+%Mv_{n+1}=Mv_n+\Delta{}t\left(1-\gamma\right)Ma_n+\Delta{}t\gamma{}Ma_{n+1},\\
+%Mu_{n+1}=Mu_n+\Delta{}t{}Mv_n+\Delta{}t^2\left(\dfrac{1}{2}-\beta\right)Ma_n+\Delta{}t^2\beta{}Ma_{n+1},
+%\end{gather}
+%with
+%\begin{gather}
+%Ma_n=p_n-f_n-Cv_n-Ku_n,\\
+%Ma_{n+1}=p_{n+1}-f_{n+1}-Cv_{n+1}-Ku_{n+1},
+%\end{gather}
+%and
+%\begin{gather}
+%f_{n+1}=\dfrac{2-s\Delta{}t}{2+s\Delta{}t}f_n+\dfrac{m\Delta{}t}{2+s\Delta{}t}v_n+\dfrac{m\Delta{}t}{2+s\Delta{}t}v_{n+1}.
+%\end{gather}
+%Choose $\mb{x}=\begin{bmatrix}
+%f&u&v
+%\end{bmatrix}^\mT$ as the state variable, the amplification matrix can be computed as
+%\begin{gather}
+%\mb{A}=\mb{A}_1^{-1}\mb{A}_2
+%\end{gather}
+%with
+%\begin{gather}
+%\mb{A}_1=\begin{bmatrix}
+%2+s\Delta{}t&\cdot&-m\Delta{}t\\
+%\Delta{}t\gamma&\Delta{}t\gamma{}K&M+\Delta{}t\gamma{}C\\
+%\Delta{}t^2\beta&M+\Delta{}t^2\beta{}K&\Delta{}t^2\beta{}C
+%\end{bmatrix},\\
+%\mb{A}_2=\begin{bmatrix}
+%2-s\Delta{}t&\cdot&m\Delta{}t\\
+%\Delta{}t\left(\gamma-1\right)&\Delta{}t\left(\gamma-1\right)K&M+\Delta{}t\left(\gamma-1\right)C\\
+%\Delta{}t^2\left(\beta-\dfrac{1}{2}\right)&M+\Delta{}t^2\left(\beta-\dfrac{1}{2}\right)K&\Delta{}tM+\Delta{}t^2\left(\beta-\dfrac{1}{2}\right)C
+%\end{bmatrix}.
+%\end{gather}
+\section{Nonviscous Damping With Arbitrary Kernels}\label{sec:arbitrary}
+\algoref{algo:single_model} alone does not enable adoption of arbitrary kernel functions, thus, it has limited applicability. To allow arbitrary kernels to be used, in this section, we present a strategy to decompose arbitrary kernels with arbitrary distributions into a series of exponential functions. Each of which can be solved by using \algoref{algo:single_model} as the basic building block.
+\subsection{Sum of Exponentials}
+Now consider, instead of a single exponential function, multiple exponential functions such that
+\begin{gather}\label{eq:sum_exp}
+g=\sum_{l=1}^{j}g_l\left(t\right)=\sum_{l=1}^{j}m_l\exp\left(-s_lt\right),
+\end{gather}
+where $m_l$ and $s_l$ can now be complex numbers, then
+\begin{gather}\label{eq:sum_conv}
+\bbf=g*\bw=\sum_{l=1}^{j}g_l*\bw=\sum_{l=1}^{j}\bbf_l.
+\end{gather}
+For each $\bbf_l$, \eqsref{eq:discretised_c} also holds and only involves $\bbf_l$ itself and the common quantity $\bw$. Thus,
+\begin{gather}
+\bbf_l=\dfrac{2-s_l\Delta{}t}{2+s_l\Delta{}t}\bbf_{l,n}+\dfrac{m_l\Delta{}t}{2+s_l\Delta{}t}\bw_n+\dfrac{m_l\Delta{}t}{2+s_l\Delta{}t}\bw.
+\end{gather}
+
+Similar to the single exponential case, substituting $\bbf_l$ into \eqsref{eq:eom}, differentiation yields the revised stiffness
+\begin{gather}\label{eq:revised_k_multi}
+\bhat{K}=\bbar{K}+\sum_{l=1}^{j}\dfrac{m_l\Delta{}t}{2+s_l\Delta{}t}\mb{T}\ddfrac{\bv}{\bu},
+\end{gather}
+and the revised resistance
+\begin{gather}\label{eq:revised_y_multi}
+\bhat{y}=\mb{y}+\sum_{l=1}^{j}\dfrac{2-s_l\Delta{}t}{2+s_l\Delta{}t}\bbf_{l,n}+\sum_{l=1}^{j}\dfrac{m_l\Delta{}t}{2+s_l\Delta{}t}\bw_n+\sum_{l=1}^{j}\dfrac{m_l\Delta{}t}{2+s_l\Delta{}t}\bw.
+\end{gather}
+
+Noting that within each sum, the operations performed are identical to that in the single exponential case, the complexity, in this case, is $\mathcal{O}\left(jn\right)$ for both time and space. As long as parameters $m_l$ and $s_l$ are real or pairs of complex conjugates, $\bbf$ is guaranteed to be real.
+\subsection{Damping Composition}
+It is possible to assign different kernels to different subsets of the velocity vector $\bv$. Formally, \eqsref{eq:sum_conv} can be further extended as
+\begin{gather}
+\bbf=\sum_{k=1}^{i}g^k*\bw^k,
+\end{gather}
+where $g^k$ is the kernel applied to $k$-th subset of $\bv$, $\bw^k=\mb{T}^k\bv$, and is expressed as the sum of exponentials,
+\begin{gather}
+g^k=\sum_{l=1}^{j^k}g_l^k\left(t\right)=\sum_{l=1}^{j^k}m_l^k\exp\left(-s_l^kt\right),
+\end{gather}
+in its explicit form,
+\begin{gather}\label{eq:composition}
+\bbf=\sum_{k=1}^{i}\sum_{l=1}^{j^k}\bbf_l^k=\sum_{k=1}^{i}\sum_{l=1}^{j^k}g_l^k\left(t\right)\bw^k=\sum_{k=1}^{i}\sum_{l=1}^{j^k}m_l^k\exp\left(-s_l^kt\right)\bw^k.
+\end{gather}
+In the above, $m_l^k$ and $s_l^k$ are the parameters for the $l$-th component of the $k$-th kernel, $\bw^k=\mb{T}^k\bv$ can be obtained by either node-based or element-based rules. For the former, it is assumed different regions (characterised by nodes) possess different damping responses. For the latter, it is assumed different elements possess different damping responses, similar to a typical assembly process, example applications can be seen elsewhere \citep{Friswell2007}.
+In a broader configuration, $\mb{T}^k$ can also be defined as a combination of stiffness and mass matrices.
+No matter how $\bw^k$ is constructed, the revised stiffness and resistance for each $\bbf_l^k$ only require vector--scalar operations (while $\bw^k$ itself may be computed based on $\bv$ via matrix--vector operations).
+
+Since additivity still holds, there is no essential difference between \eqsref{eq:sum_conv} and \eqsref{eq:composition}, the same discretisation can be applied so that the revised stiffness and resistance can be obtained as
+\begin{gather}\label{eq:revised_k_comp}
+\bhat{K}=\bbar{K}+\sum_{k=1}^{i}\sum_{l=1}^{j^k}\dfrac{m_l^k\Delta{}t}{2+s_l^k\Delta{}t}\mb{T}^k\ddfrac{\bv}{\bu},\\
+\label{eq:revised_y_comp}
+\bhat{y}=\mb{y}+\sum_{k=1}^{i}\sum_{l=1}^{j^k}\dfrac{2-s_l^k\Delta{}t}{2+s_l^k\Delta{}t}\bbf_{l,n}^k+\sum_{k=1}^{i}\sum_{l=1}^{j^k}\dfrac{m_l^k\Delta{}t}{2+s_l^k\Delta{}t}\bw_n^k+\sum_{k=1}^{i}\sum_{l=1}^{j^k}\dfrac{m_l^k\Delta{}t}{2+s_l^k\Delta{}t}\bw^k.
+\end{gather}
+Denoting
+\begin{gather}
+j_\text{max}=\max_{k\in\{1,2,\cdots,i\}}\left(j^k\right),
+\end{gather}
+the time and space complexity is $\mathcal{O}\left(ij_\text{max}n\right)$.
+\subsection{Arbitrary Kernels}
+Sum of exponentials is able to provide a wide coverage of various kernel functions \citep[c.f.,][]{Adhikari2003}, as a decent amount of kernels can be equivalently expressed as sums of exponentials.
+
+It is clear that the Fourier transform (exponential form) allows one to express arbitrary smooth function $g\left(t\right)$ as an infinite sum of exponentials, even if $g\left(t\right)$ is non-periodic. It is possible to approximate $g\left(t\right)$ if a fast converging exponential series can be found.
+One can use Prony's method \citep[see, e.g.,][]{Hamming1987} and its derivations \citep{Hokanson2013} to find a proper approximation.
+\citet{Du2022} adopted a similar technique, via which the convolution term is approximated by an IIR filter.
+However, it tends to have a slow convergence \citep{Trudnowski1999} which inevitably leads to a large number of exponentials that would impair computational efficiency.
+Alternatively, functions can be approximated by sums of exponentials or Gaussians, for further discussions on this topic, one can refer to the review by \citet{Beylkin2010}. By further adopting model reduction, \citet{Gao2022} presented a method, named as VPMR, with controllable magnitudes of exponents and fast convergence, to compute the desired approximation, formally,
+\begin{gather}
+\max_{t\in{}I}{\abs{g\left(t\right)-\sum_jm_j\exp\left(-s_jt\right)}}<\epsilon,
+\end{gather}
+where $I$ is a finite interval that could be an arbitrary subset of $\mathbb{R}^+$, $\epsilon$ is the error tolerance.
+
+By using VPMR, it is feasible to convert nonviscous damping with arbitrary (in terms of both number and form) kernels applied to the dynamic system into the form of \eqsref{eq:composition}. Noting that $\epsilon$ is a user input, by assigning a tolerance close to (or less than) machine epsilon --- around \num{e-16} for double precision floating point representation, an accurate equivalence of arbitrary kernel function can be obtained for nonviscous damping computation. In practice, such a tolerance only needs to be smaller than the time history analysis tolerance.
+
+\begin{breakablealgorithm}
+\setstretch{1.6}
+\caption{iteration body of solving nonviscously damped system with arbitrary kernels}\label{algo:vpmr}
+\begin{algorithmic}
+\State \textbf{*Schema: Newmark + Trapezoidal}
+\State \textbf{Input}: $\bbar{K}$, $\bu$, $\bv$, $\mb{y}$, $\mb{p}$ (quantities obtained via conventional manner as if there is no nonviscous damping) and $\bbf_{l,n}^k$, $m_l^k$, $s_l^k$
+\State \textbf{Output}: $\bu$
+\State obtain $\bw^k$ from $\bv$ based on prescribed rules
+\State \faMicrochip~compute nonviscous damping force $\bbf$\Comment{\eqsref{eq:revised_y_comp}}
+\State \faMicrochip~compute revised stiffness $\bhat{K}$\Comment{\eqsref{eq:revised_k_comp}}
+\State \faMicrochip~compute revised resistance $\bhat{y}=\mb{y}+\bbf$\Comment{\eqsref{eq:revised_y_comp}}
+\State $\delta\bu=\bhat{K}^{-1}\left(\mb{p}-\bhat{y}\right)$
+\State update and return $\bu\leftarrow\bu+\delta\bu$
+\end{algorithmic}
+\end{breakablealgorithm}
+
+It is worth emphasising that converting the desired kernel functions to sums of exponentials a) is independent of the dynamic system of interest and b) is performed offline, viz., ahead of time.
+Compared to the conventional solving procedure for undamped systems, the additional cost is solely governed by the number of exponentials used, as \eqsref{eq:revised_k_comp} and \eqsref{eq:revised_y_comp} only require summations of scaled matrices/vectors.
+Combining with \algoref{algo:vpmr}, the following procedure can be employed to model nonviscously damped systems with arbitrary kernels.
+\begin{Objective}
+\begin{enumerate}
+\item Determine number and form of kernels $g^k$, and the corresponding $\mb{T}^k$, to be used.
+\item Determine tolerance $\epsilon$ of time history analysis.
+\item Use the VPMR algorithm \citep{Gao2022} to find approximations of kernels with tolerance set to $\epsilon$ such that for each $k$,
+\begin{gather}
+\abs{g^k-\sum_lm_l^k\exp\left(-s_l^kt\right)}<\epsilon.
+\end{gather}
+\item With parameters $m_l^k$ and $s_l^k$ obtained from the VPMR algorithm, use \algoref{algo:vpmr} to solve the dynamic system.
+\end{enumerate}
+\end{Objective}
+It shall be pointed out that in this work, the trapezoidal rule combined with the Newmark method is employed. As mentioned before, different combinations, referred here as schemas, can be used as alternatives. The specific iterative algorithms need to be derived separately. The expressions involved in \algoref{algo:vpmr}, as well as \algoref{algo:single_model}, are only applicable to the Newmark method with the trapezoidal rule.
