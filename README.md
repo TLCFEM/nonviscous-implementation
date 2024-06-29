@@ -16,3 +16,6 @@ The nonviscous damping model is implemented in `suanPan` as:
 1. a global damping model with the Newmark method: [NonviscousNewmark](https://tlcfem.github.io/suanPan-manual/latest/Library/Integrator/Newmark/NonviscousNewmark/)
 2. a material model that can be used in spring elements: [Nonviscous01](https://tlcfem.github.io/suanPan-manual/latest/Library/Material/Material1D/Viscosity/Nonviscous01/)
 3. a modifier that can be applied to arbitrary elements: [ElementalNonviscous](https://tlcfem.github.io/suanPan-manual/latest/Library/Element/Modifier/ElementalNonviscous/)
+
+
+The VPMR algorithm is implemented in [this](https://github.com/TLCFEM/vpmr) repository.
