@@ -1,5 +1,5 @@
 numpy==2.2.4
 scipy==1.15.2
-h5py==3.13.0
+h5py==3.14.0
 matplotlib==3.10.1
 sympy==1.13.3
